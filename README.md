@@ -23,7 +23,7 @@ Let's first obey the number one rule for mappers, a benchmark;
 * Does not crash when faced with circular-dependencies during registration
 * In fact, can resolve recurring instances to same target instance (yaay no StackOverflowException!)
 * Can project IQueryable\<TSource\> to IQueryable\<TTarget\> with respect to includes (via auto-detection or with custom parameters)
-* You can project IEnumerable\<TSource\>'s too
+* and much more...
 
 # API
 Registration with static API;
