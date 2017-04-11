@@ -19,7 +19,7 @@ Let's first obey the number one rule for mappers, a benchmark;
 * Fast (enough)
 * NOT over-engineered, code is really simple
 * Instantiatable mapper
-* Convention based, zero configuration static shortcut exists too (of course named Mapper)
+* Convention based, zero configuration static shortcut exists too (obviously named Mapper)
 * Does not crash when faced with circular-dependencies during registration
 * In fact, can resolve recurring instances to same target instance (yaay no StackOverflowException!)
 * Can project IQueryable\<TSource\> to IQueryable\<TTarget\> with respect to includes (via auto-detection or with custom parameters)
@@ -58,6 +58,5 @@ or with expanding specific navigations;
 ```csharp
 customerQuery.ProjectTo<Customer, CustomerDTO>(c => c.Addresses, , c => c.Orders);
 ```
-
 
 Developed with :heart: at Doğuş Teknoloji.
