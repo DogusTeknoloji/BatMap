@@ -35,12 +35,13 @@ or use an instance;
 var mapper = new MapConfiguration(dynamicMapping: DynamicMapping.MapAndCache, preserveReferences: true);
 mapper.RegisterMap<Customer, CustomerDTO>();
 ```
+Note: You don't have to register type mappings when using a MapConfiguration with Dynamic Mapping enabled (like the static API uses).
+
+
 You can customize expressions for members;
 ```csharp
 mapper.RegisterMap<OrderDetail, OrderDetailDTO>(b => b.MapMember(od => od.SubPrice, (od, mc) => od.Count * od.UnitPrice));
 ```
-
-Note: You don't have to register type mappings when using a MapConfiguration with Dynamic Mapping enabled (like the static API uses).
 
 Map an object;
 ```csharp
