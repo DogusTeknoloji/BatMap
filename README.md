@@ -2,7 +2,7 @@
 Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.
 
 
-Let's first obey the number one rule for mappers, a benchmark;
+Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/);
 
 |      Method |      Mean |    StdDev |
 |------------ |---------- |---------- |
