@@ -25,18 +25,39 @@ Let's first obey the number one rule for mappers, a benchmark;
 * Can project IQueryable\<TSource\> to IQueryable\<TTarget\> with respect to includes (via auto-detection or with custom parameters)
 * You can project IEnumerable\<TSource\>'s too
 
+# API
 Registration with static API;
-```
+```csharp
 Mapper.RegisterMap<Customer, CustomerDTO>();
 ```
 or use an instance;
-```
+```csharp
 var mapper = new MapConfiguration(dynamicMapping: DynamicMapping.MapAndCache, preserveReferences: true);
 mapper.RegisterMap<Customer, CustomerDTO>();
 ```
 You can customize expressions for members;
-```
+```csharp
 mapper.RegisterMap<OrderDetail, OrderDetailDTO>(b => b.MapMember(od => od.SubPrice, (od, mc) => od.Count * od.UnitPrice));
 ```
+
+Note: You don't have to register type mappings when using a MapConfiguration with Dynamic Mapping enabled (like the static API uses).
+
+Map an object;
+```csharp
+Mapper.Map<CustomerDTO>(customer);
+```
+Map an enumerable;
+```csharp
+customers.Map<Customer, CustomerDTO>(preserveReferences: true);  // extension methods FTW!
+```
+Project a query;
+```csharp
+customerQuery.ProjectTo<CustomerDTO>(checkIncludes: true);
+```
+or with expanding specific navigations;
+```csharp
+customerQuery.ProjectTo<Customer, CustomerDTO>(c => c.Addresses, , c => c.Orders);
+```
+
 
 Developed with :heart: at Doğuş Teknoloji.
