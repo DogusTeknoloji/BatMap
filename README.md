@@ -25,4 +25,18 @@ Let's first obey the number one rule for mappers, a benchmark;
 * Can project IQueryable\<TSource\> to IQueryable\<TTarget\> with respect to includes (via auto-detection or with custom parameters)
 * You can project IEnumerable\<TSource\>'s too
 
+Registration with static API;
+```
+Mapper.RegisterMap<Customer, CustomerDTO>();
+```
+or use an instance;
+```
+var mapper = new MapConfiguration(dynamicMapping: DynamicMapping.MapAndCache, preserveReferences: true);
+mapper.RegisterMap<Customer, CustomerDTO>();
+```
+You can customize expressions for members;
+```
+mapper.RegisterMap<OrderDetail, OrderDetailDTO>(b => b.MapMember(od => od.SubPrice, (od, mc) => od.Count * od.UnitPrice));
+```
+
 Developed with :heart: at Doğuş Teknoloji.
