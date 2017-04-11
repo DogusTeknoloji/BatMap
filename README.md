@@ -40,7 +40,7 @@ Note: You don't have to register type mappings when using a MapConfiguration wit
 
 You can customize expressions for members;
 ```csharp
-mapper.RegisterMap<OrderDetail, OrderDetailDTO>(b => b.MapMember(od => od.SubPrice, (od, mc) => od.Count * od.UnitPrice));
+mapper.RegisterMap<Order, OrderDTO>(b => b.MapMember(o => o.Price, (o, mc) => o.Count * o.UnitPrice));
 ```
 
 Map an object;
