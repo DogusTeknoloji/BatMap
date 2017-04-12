@@ -57,7 +57,7 @@ customerQuery.ProjectTo<CustomerDTO>(checkIncludes: true);
 ```
 or with expanding specific navigations;
 ```csharp
-customerQuery.ProjectTo<Customer, CustomerDTO>(c => c.Addresses, , c => c.Orders);
+customerQuery.ProjectTo<Customer, CustomerDTO>(c => c.Addresses, c => c.Orders);
 ```
 
 Note: If you want to change mapping behavior, create a class that inherits from ExpressionProvider, override CreateMemberBinding and inject an instance of your class to MapConfiguration.
