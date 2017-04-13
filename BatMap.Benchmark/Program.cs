@@ -44,7 +44,7 @@ namespace BatMap.Benchmark {
             Mapper.RegisterMap<Order, OrderDTO>();
             Mapper.RegisterMap<OrderDetail, OrderDetailDTO>();
 
-            AutoMapper.Mapper.Initialize(cfg => {
+            global::AutoMapper.Mapper.Initialize(cfg => {
                 cfg.CreateMap<Customer, CustomerDTO>();
                 cfg.CreateMap<Address, AddressDTO>();
                 cfg.CreateMap<City, CityDTO>();
@@ -52,11 +52,11 @@ namespace BatMap.Benchmark {
                 cfg.CreateMap<OrderDetail, OrderDetailDTO>();
             });
 
-            ExpressMapper.Mapper.Register<Customer, CustomerDTO>();
-            ExpressMapper.Mapper.Register<Address, AddressDTO>();
-            ExpressMapper.Mapper.Register<City, CityDTO>();
-            ExpressMapper.Mapper.Register<Order, OrderDTO>();
-            ExpressMapper.Mapper.Register<OrderDetail, OrderDetailDTO>();
+            global::ExpressMapper.Mapper.Register<Customer, CustomerDTO>();
+            global::ExpressMapper.Mapper.Register<Address, AddressDTO>();
+            global::ExpressMapper.Mapper.Register<City, CityDTO>();
+            global::ExpressMapper.Mapper.Register<Order, OrderDTO>();
+            global::ExpressMapper.Mapper.Register<OrderDetail, OrderDetailDTO>();
 
             Nelibur.ObjectMapper.TinyMapper.Bind<Customer, CustomerDTO>();
             Nelibur.ObjectMapper.TinyMapper.Bind<Address, AddressDTO>();
@@ -65,14 +65,14 @@ namespace BatMap.Benchmark {
             Nelibur.ObjectMapper.TinyMapper.Bind<OrderDetail, OrderDetailDTO>();
 
             var p = new Program();
-            p.ByHand();
-            p.Bat_Map();
-            p.Auto_Map();
-            p.Express_Map();
-            p.Fast_Map();
-            p.Mapster_Map();
-            p.Safe_Map();
-            p.Tiny_Map();
+            p.HandWritten();
+            p.BatMap();
+            p.AutoMapper();
+            p.ExpressMapper();
+            p.FastMapper();
+            p.Mapster();
+            p.SafeMapper();
+            p.TinyMapper();
         }
 
         static void Main(string[] args) {
@@ -80,7 +80,7 @@ namespace BatMap.Benchmark {
         }
 
         [Benchmark]
-        public void ByHand() {
+        public void HandWritten() {
             var customerDTOs = _customers.Select(c => new CustomerDTO {
                 Id = c.Id,
                 Addresses = c.Addresses.Select(a => new AddressDTO {
@@ -109,37 +109,37 @@ namespace BatMap.Benchmark {
         }
 
         [Benchmark]
-        public void Bat_Map() {
+        public void BatMap() {
             var customerDTOs = _customers.Map<Customer, CustomerDTO>().ToList();
         }
 
         [Benchmark]
-        public void Auto_Map() {
-            var customerDTOs = _customers.Select(c => AutoMapper.Mapper.Map<CustomerDTO>(c)).ToList();
+        public void AutoMapper() {
+            var customerDTOs = _customers.Select(c => global::AutoMapper.Mapper.Map<CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
-        public void Express_Map() {
-            var customerDTOs = _customers.Select(c => ExpressMapper.Mapper.Map<Customer, CustomerDTO>(c)).ToList();
+        public void ExpressMapper() {
+            var customerDTOs = _customers.Select(c => global::ExpressMapper.Mapper.Map<Customer, CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
-        public void Fast_Map() {
-            var customerDTOs = FastMapper.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
+        public void FastMapper() {
+            var customerDTOs = global::FastMapper.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 
         [Benchmark]
-        public void Mapster_Map() {
-            var customerDTOs = Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
+        public void Mapster() {
+            var customerDTOs = global::Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 
         [Benchmark]
-        public void Safe_Map() {
-            var customerDTOs = _customers.Select(c => SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
+        public void SafeMapper() {
+            var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
-        public void Tiny_Map() {
+        public void TinyMapper() {
             var customerDTOs = _customers.Select(c => Nelibur.ObjectMapper.TinyMapper.Map<Customer, CustomerDTO>(c)).ToList();
         }
     }
