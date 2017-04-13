@@ -7,6 +7,9 @@ using BatMap.Tests.Model;
 
 namespace BatMap.Tests {
 
+    /// <summary>
+    /// Tests only static API method signatures.
+    /// </summary>
     [TestClass]
     public class StaticTests {
         public IList<Customer> Customers;
@@ -34,7 +37,15 @@ namespace BatMap.Tests {
             Mapper.RegisterMap<Customer, CustomerDTO>(b => {
                 b.SkipMember(c => c.Endorsement);
             });
+        }
+
+        [TestMethod]
+        public void RegisterWithType() {
             Mapper.RegisterMap(typeof(City), typeof(CityDTO));
+        }
+
+        [TestMethod]
+        public void RegisterWithExpression() {
             Mapper.RegisterMap<City, CityDTO>((c, mc) => new CityDTO { Id = c.Id, Name = c.Name, Population = c.Population });
         }
 
@@ -86,22 +97,69 @@ namespace BatMap.Tests {
         }
 
         [TestMethod]
-        public void ProjectTo() {
+        public void Enumerable_ProjectTo() {
             var dtos = Customers.ProjectTo<Customer, CustomerDTO>(false);
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
 
         [TestMethod]
-        public void ProjectToWithExpression() {
+        public void Enumerable_ProjectToWithExpression() {
             var dtos = Customers.ProjectTo<Customer, CustomerDTO>(c => c.Addresses);
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
 
         [TestMethod]
-        public void ProjectToWithInclude() {
+        public void Enumerable_ProjectToWithInclude() {
             var dtos = Customers.ProjectTo<Customer, CustomerDTO>(new IncludePath("Addresses"));
+
+            Assert.AreEqual(dtos.Count(), Customers.Count);
+        }
+
+        [TestMethod]
+        public void Queryable_ProjectTo() {
+            var dtos = Customers.AsQueryable().ProjectTo<CustomerDTO>(true);
+
+            Assert.AreEqual(dtos.Count(), Customers.Count);
+        }
+
+        [TestMethod]
+        public void Queryable_ProjectToWithExpression() {
+            var dtos = Customers.AsQueryable().ProjectTo<Customer, CustomerDTO>(c => c.Addresses);
+
+            Assert.AreEqual(dtos.Count(), Customers.Count);
+        }
+
+
+        [TestMethod]
+        public void Queryable_ProjectToWithInclude() {
+            var dtos = Customers.AsQueryable().ProjectTo<CustomerDTO>(new IncludePath("Addresses"));
+
+            Assert.AreEqual(dtos.Count(), Customers.Count);
+        }
+
+        [TestMethod]
+        public void GetProjector() {
+            var projector = Mapper.GetProjector<Customer, CustomerDTO>(false);
+            var dtos = Customers.Select(projector.Compile());
+
+            Assert.AreEqual(dtos.Count(), Customers.Count);
+        }
+
+        [TestMethod]
+        public void GetProjector_WithExpression() {
+            var projector = Mapper.GetProjector<Customer, CustomerDTO>(c => c.Addresses);
+            var dtos = Customers.Select(projector.Compile());
+
+            Assert.AreEqual(dtos.Count(), Customers.Count);
+        }
+
+
+        [TestMethod]
+        public void GetProjector_WithInclude() {
+            var projector = Mapper.GetProjector<Customer, CustomerDTO>(new IncludePath("Addresses"));
+            var dtos = Customers.Select(projector.Compile());
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
