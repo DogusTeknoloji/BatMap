@@ -14,7 +14,8 @@ Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkD
 |    TinyMapper | 2.9644 ms | 0.0768 ms |
 | ExpressMapper | 5.1630 ms | 0.0130 ms |
 |    FastMapper | 5.8862 ms | 0.0277 ms |
-    
+
+<sub>Results may (probably) vary</sub>
     
 * Fast (enough)
 * NOT over-engineered, code is really simple
