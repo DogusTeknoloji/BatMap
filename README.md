@@ -9,7 +9,7 @@ Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkD
 |     BatMap :boom: | 1.9211 ms :boom: | 0.0108 ms :boom: |
 | Mapster | 2.0357 ms | 0.0161 ms |
 |    SafeMapper | 2.0797 ms | 0.0273 ms |
-|      ByHand | 2.1018 ms | 0.0906 ms |
+|      HandWritten | 2.1018 ms | 0.0906 ms |
 |    AutoMapper | 2.8359 ms | 0.0253 ms |
 |    TinyMapper | 2.9644 ms | 0.0768 ms |
 | ExpressMapper | 5.1630 ms | 0.0130 ms |
