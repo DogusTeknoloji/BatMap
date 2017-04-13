@@ -63,7 +63,17 @@ namespace BatMap.Benchmark {
             Nelibur.ObjectMapper.TinyMapper.Bind<City, CityDTO>();
             Nelibur.ObjectMapper.TinyMapper.Bind<Order, OrderDTO>();
             Nelibur.ObjectMapper.TinyMapper.Bind<OrderDetail, OrderDetailDTO>();
+        }
 
+        static void Main(string[] args) {
+            var summary = BenchmarkRunner.Run<Program>();
+            //ManualTest();
+        }
+
+        /// <summary>
+        /// Used for benchmarking via [Visual Studio -> Analyze -> Performance Profiler]
+        /// </summary>
+        public static void ManualTest() {
             var p = new Program();
             p.HandWritten();
             p.BatMap();
@@ -73,10 +83,6 @@ namespace BatMap.Benchmark {
             p.Mapster();
             p.SafeMapper();
             p.TinyMapper();
-        }
-
-        static void Main(string[] args) {
-            var summary = BenchmarkRunner.Run<Program>();
         }
 
         [Benchmark]
