@@ -8,4 +8,4 @@ install:
   - mono .nuget/nuget.exe restore BatMap.sln -Verbosity detailed
 script:
   - xbuild /p:Configuration=Release BatMap.sln
-  - mono ./packages/NUnit.ConsoleRunner.3.6.1/tools/nunit-console.exe ./BatMap.Tests/bin/Release/BatMap.Tests.dll
+  - mono ./packages/NUnit.ConsoleRunner*/tools/nunit3-console.exe ./BatMap.Tests/bin/Release/BatMap.Tests.dll
