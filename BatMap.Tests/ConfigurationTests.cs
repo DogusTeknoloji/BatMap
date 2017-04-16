@@ -1,10 +1,25 @@
-﻿namespace BatMap.Tests {
+﻿using System;
+using BatMap.Tests.DTO;
+using BatMap.Tests.Model;
+using NUnit.Framework;
 
+namespace BatMap.Tests {
+
+    [TestFixture]
     public class ConfigurationTests {
-        private readonly MapConfiguration _config;
 
-        public ConfigurationTests(MapConfiguration config) {
-            _config = config;
+        [Test]
+        public void Unregistered_Throws_Exception() {
+            var config = new MapConfiguration();
+
+            try {
+                config.Map<CustomerDTO>(new Customer());
+
+                Assert.Fail("Should have thrown InvalidOperationException.");
+            }
+            catch (InvalidOperationException) {
+                Assert.Pass();
+            }
         }
     }
 }
