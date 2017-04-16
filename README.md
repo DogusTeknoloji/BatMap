@@ -6,16 +6,16 @@ Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.
 
 Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/)):
 
-|        Method |      Mean |    StdDev |
-|-------------- |---------- |---------- |
-|        BatMap :boom:| 1.8563 ms :boom:| 0.0106 ms :boom:|
-|       Mapster | 2.0414 ms | 0.0079 ms |
-|    SafeMapper | 2.0589 ms | 0.0572 ms |
-|   HandWritten | 2.1000 ms | 0.0079 ms |
-|    AutoMapper | 2.7422 ms | 0.0157 ms |
-|    TinyMapper | 2.8609 ms | 0.0099 ms |
-| ExpressMapper | 4.9961 ms | 0.0128 ms |
-|    FastMapper | 5.7874 ms | 0.0186 ms |
+|        Method |      Mean |
+|-------------- |---------- |
+|        BatMap :boom:| 1.8563 ms :boom:|
+|       Mapster | 2.0414 ms |
+|    SafeMapper | 2.0589 ms |
+|   HandWritten | 2.1000 ms |
+|    AutoMapper | 2.7422 ms |
+|    TinyMapper | 2.8609 ms |
+| ExpressMapper | 4.9961 ms |
+|    FastMapper | 5.7874 ms |
 
 <sup>Results may (probably) vary</sup>
     
