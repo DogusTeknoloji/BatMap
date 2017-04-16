@@ -34,7 +34,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachePair.cs" />
     <Compile Include="DynamicMapping.cs" />
     <Compile Include="ExpressionProvider.cs" />
     <Compile Include="Helper.cs" />
@@ -45,7 +44,6 @@
     <Compile Include="MapContext.cs" />
     <Compile Include="MapDefinition.cs" />
     <Compile Include="MapMember.cs" />
-    <Compile Include="MapPair.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="ParameterReplaceVisitor.cs" />
     <Compile Include="ProjectionVisitor.cs" />

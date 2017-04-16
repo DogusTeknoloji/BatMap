@@ -86,6 +86,21 @@ namespace BatMap.Benchmark {
         }
 
         [Benchmark]
+        public void BatMap() {
+            var customerDTOs = _customers.Map<Customer, CustomerDTO>().ToList();
+        }
+
+        [Benchmark]
+        public void Mapster() {
+            var customerDTOs = global::Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
+        }
+
+        [Benchmark]
+        public void SafeMapper() {
+            var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
+        }
+
+        [Benchmark]
         public void HandWritten() {
             var customerDTOs = _customers.Select(c => new CustomerDTO {
                 Id = c.Id,
@@ -115,13 +130,13 @@ namespace BatMap.Benchmark {
         }
 
         [Benchmark]
-        public void BatMap() {
-            var customerDTOs = _customers.Map<Customer, CustomerDTO>().ToList();
+        public void AutoMapper() {
+            var customerDTOs = _customers.Select(c => global::AutoMapper.Mapper.Map<CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
-        public void AutoMapper() {
-            var customerDTOs = _customers.Select(c => global::AutoMapper.Mapper.Map<CustomerDTO>(c)).ToList();
+        public void TinyMapper() {
+            var customerDTOs = _customers.Select(c => Nelibur.ObjectMapper.TinyMapper.Map<Customer, CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
@@ -132,21 +147,6 @@ namespace BatMap.Benchmark {
         [Benchmark]
         public void FastMapper() {
             var customerDTOs = global::FastMapper.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
-        }
-
-        [Benchmark]
-        public void Mapster() {
-            var customerDTOs = global::Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
-        }
-
-        [Benchmark]
-        public void SafeMapper() {
-            var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
-        }
-
-        [Benchmark]
-        public void TinyMapper() {
-            var customerDTOs = _customers.Select(c => Nelibur.ObjectMapper.TinyMapper.Map<Customer, CustomerDTO>(c)).ToList();
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 namespace BatMap {
 
     public sealed class MapContext {
-        private readonly Dictionary<CachePair, object> _referenceCache = new Dictionary<CachePair, object>();
+        private readonly Dictionary<int, object> _referenceCache = new Dictionary<int, object>();
         private readonly MapConfiguration _mapper;
 
         public MapContext(MapConfiguration mapper, bool preserveReferences) {
@@ -16,12 +16,12 @@ namespace BatMap {
         internal bool PreserveReferences { get; }
 
         public void NewInstance(object inObj, object outObj) {
-            _referenceCache[new CachePair(inObj, outObj.GetType())] = outObj;
+            _referenceCache[Helper.GenerateHashCode(inObj, outObj.GetType())] = outObj;
         }
 
         public bool GetFromCache<TOut>(object inObj, out TOut outObj) {
             object o;
-            if (_referenceCache.TryGetValue(new CachePair(inObj, typeof(TOut)), out o)) {
+            if (_referenceCache.TryGetValue(Helper.GenerateHashCode(inObj, typeof(TOut)), out o)) {
                 outObj = (TOut)o;
                 return true;
             }

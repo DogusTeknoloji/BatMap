@@ -9,7 +9,7 @@ namespace BatMap {
     public class MapConfiguration {
         private static readonly Lazy<MethodInfo> _lazyRegisterMapMethod;
         private static readonly Lazy<MethodInfo> _lazyGenerateMapDefinitionMethod;
-        private readonly Dictionary<MapPair, IMapDefinition> _mapDefinitions = new Dictionary<MapPair, IMapDefinition>();
+        private readonly Dictionary<int, IMapDefinition> _mapDefinitions = new Dictionary<int, IMapDefinition>();
         private readonly ExpressionProvider _expressionProvider;
         private readonly DynamicMapping _dynamicMapping;
         private readonly bool _preserveReferences;
@@ -51,7 +51,7 @@ namespace BatMap {
         }
 
         private IMapDefinition<TIn, TOut> RegisterMapImpl<TIn, TOut>(IMapDefinition<TIn, TOut> mapDefinition) {
-            _mapDefinitions[new MapPair(typeof(TIn), typeof(TOut))] = mapDefinition;
+            _mapDefinitions[Helper.GenerateHashCode(typeof(TIn), typeof(TOut))] = mapDefinition;
 
             return mapDefinition;
         }
@@ -62,7 +62,7 @@ namespace BatMap {
 
         internal IMapDefinition GetMapDefinition(Type inType, Type outType) {
             IMapDefinition mapDefinition;
-            var pairKey = new MapPair(inType, outType);
+            var pairKey = Helper.GenerateHashCode(inType, outType);
             if (!_mapDefinitions.TryGetValue(pairKey, out mapDefinition)) {
                 if (_dynamicMapping == DynamicMapping.NotAllowed)
                     throw new InvalidOperationException($"Cannot find map definition between {inType.Name} and {outType.Name}.");
@@ -115,7 +115,7 @@ namespace BatMap {
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             var inType = inObj.GetType();
             foreach (var kvp in _mapDefinitions) {
-                if (kvp.Key.InType == inType) {
+                if (kvp.Value.InType == inType) {
                     return Map(inObj, mapContext, kvp.Value);
                 }
             }

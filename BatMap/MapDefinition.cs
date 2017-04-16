@@ -16,10 +16,16 @@ namespace BatMap {
         }
 
         internal MapDefinition(Expression<Func<TIn, MapContext, TOut>> projector) {
+            InType = typeof(TIn);
+            OutType = typeof(TOut);
             Projector = projector;
             Mapper = Helper.CreateMapper(projector);
             _lazyMapperWithCache = new Lazy<Func<TIn, MapContext, TOut>>(() => CompileMapperWithCache());
         }
+
+        public Type InType { get; }
+
+        public Type OutType { get; }
 
         public Expression<Func<TIn, MapContext, TOut>> Projector { get; }
 
@@ -85,6 +91,8 @@ namespace BatMap {
     }
 
     public interface IMapDefinition {
+        Type InType { get; }
+        Type OutType { get; }
         LambdaExpression Projector { get; }
         Delegate Mapper { get; }
         Delegate MapperWithCache { get; }
