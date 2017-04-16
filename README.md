@@ -3,7 +3,7 @@ Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.
 
 [![Coverage Status](https://coveralls.io/repos/github/DogusTeknoloji/BatMap/badge.svg?branch=master)](https://coveralls.io/github/DogusTeknoloji/BatMap?branch=master)
 
-Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/));
+Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/)):
 
 |      Method |      Mean |    StdDev |
 |------------ |---------- |---------- |
@@ -28,11 +28,11 @@ Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkD
 * and much more...
 
 # API
-Registration with static API;
+Registration with static API:
 ```csharp
 Mapper.RegisterMap<Customer, CustomerDTO>();
 ```
-or use an instance;
+or use an instance:
 ```csharp
 var mapper = new MapConfiguration(dynamicMapping: DynamicMapping.MapAndCache, preserveReferences: true);
 mapper.RegisterMap<Customer, CustomerDTO>();
@@ -40,24 +40,24 @@ mapper.RegisterMap<Customer, CustomerDTO>();
 Note: You don't have to register type mappings when using a MapConfiguration with Dynamic Mapping enabled (like the static API uses).
 
 
-You can customize expressions for members;
+You can customize expressions for members:
 ```csharp
 mapper.RegisterMap<Order, OrderDTO>(b => b.MapMember(o => o.Price, (o, mc) => o.Count * o.UnitPrice));
 ```
 
-Map an object;
+Map an object:
 ```csharp
 Mapper.Map<CustomerDTO>(customer);
 ```
-Map an enumerable;
+Map an enumerable:
 ```csharp
 customers.Map<Customer, CustomerDTO>(preserveReferences: true);  // extension methods FTW!
 ```
-Project a query;
+Project a query:
 ```csharp
 customerQuery.ProjectTo<CustomerDTO>(checkIncludes: true);
 ```
-or with expanding specific navigations;
+or with expanding specific navigations:
 ```csharp
 customerQuery.ProjectTo<Customer, CustomerDTO>(c => c.Addresses, c => c.Orders);
 ```
