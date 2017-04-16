@@ -7,3 +7,6 @@ before_install:
 install:
   - mono .nuget/nuget.exe restore BatMap.sln -Verbosity detailed
   - mono .nuget/nuget.exe install NUnit.Runners -Version 3.2.1 -OutputDirectory ./packages
+script:
+  - xbuild /p:Configuration=Release BatMap.sln
+  - mono ./packages/NUnit.Runners.3.2.1/tools/nunit-console.exe ./BatMap.Tests/bin/Release/BatMap.Tests.dll
