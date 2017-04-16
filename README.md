@@ -53,7 +53,7 @@ Mapper.Map<CustomerDTO>(customer);
 ```
 Map an enumerable:
 ```csharp
-customers.Map<Customer, CustomerDTO>(preserveReferences: true);  // extension methods FTW!
+customers.MapTo<Customer, CustomerDTO>(preserveReferences: true);  // extension methods FTW!
 ```
 Project a query:
 ```csharp
