@@ -87,7 +87,7 @@ namespace BatMap.Benchmark {
 
         [Benchmark]
         public void BatMap() {
-            var customerDTOs = _customers.Map<Customer, CustomerDTO>().ToList();
+            var customerDTOs = _customers.MapTo<Customer, CustomerDTO>().ToList();
         }
 
         [Benchmark]

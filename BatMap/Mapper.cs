@@ -46,12 +46,12 @@ namespace BatMap {
             return DefaultConfig.Map(inObj, outType, preserveReferences);
         }
 
-        public static IEnumerable<TOut> Map<TIn, TOut>(this IEnumerable<TIn> source, bool? preserveReferences = null) {
-            return DefaultConfig.Map<TIn, TOut>(source, preserveReferences);
+        public static IEnumerable<TOut> MapTo<TIn, TOut>(this IEnumerable<TIn> source, bool? preserveReferences = null) {
+            return DefaultConfig.MapTo<TIn, TOut>(source, preserveReferences);
         }
 
-        public static Dictionary<TOutKey, TOutValue> Map<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source, bool? preserveReferences = null) {
-            return DefaultConfig.Map<TInKey, TInValue, TOutKey, TOutValue>(source, preserveReferences);
+        public static Dictionary<TOutKey, TOutValue> MapTo<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source, bool? preserveReferences = null) {
+            return DefaultConfig.MapTo<TInKey, TInValue, TOutKey, TOutValue>(source, preserveReferences);
         }
 
         #endregion

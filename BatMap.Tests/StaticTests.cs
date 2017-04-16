@@ -82,7 +82,7 @@ namespace BatMap.Tests {
 
         [Test]
         public void MapEnumerable() {
-            var dtos = Customers.Map<Customer, CustomerDTO>();
+            var dtos = Customers.MapTo<Customer, CustomerDTO>();
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
@@ -90,7 +90,7 @@ namespace BatMap.Tests {
         [Test]
         public void MapDictionary() {
             var dict = Customers.ToDictionary(c => c.Id, c => c);
-            var dtoDict = Mapper.Map<int, Customer, int, CustomerDTO>(dict);
+            var dtoDict = Mapper.MapTo<int, Customer, int, CustomerDTO>(dict);
 
             Assert.IsTrue(dtoDict.All(kvp => kvp.Key == kvp.Value.Id));
         }
@@ -125,7 +125,7 @@ namespace BatMap.Tests {
 
         [Test]
         public void Queryable_ProjectToWithExpression() {
-            var dtos = Customers.AsQueryable().ProjectTo<Customer, CustomerDTO>(c => c.Addresses);
+            var dtos = Customers.AsQueryable().ProjectTo<Customer, CustomerDTO>(c => c.Addresses.Select(a => a.City));
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }

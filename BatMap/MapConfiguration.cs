@@ -114,11 +114,8 @@ namespace BatMap {
 
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             var inType = inObj.GetType();
-            foreach (var kvp in _mapDefinitions) {
-                if (kvp.Value.InType == inType) {
-                    return Map(inObj, mapContext, kvp.Value);
-                }
-            }
+            var kvpMap = _mapDefinitions.FirstOrDefault(kvp => kvp.Value.InType == inType);
+            if (!Equals(kvpMap, default(KeyValuePair<int, IMapDefinition>))) return Map(inObj, mapContext, kvpMap.Value);
 
             throw new InvalidOperationException($"Map type cannot be found for {inType.Name}");
         }
@@ -139,14 +136,14 @@ namespace BatMap {
             return mapper.DynamicInvoke(inObj, mapContext);
         }
 
-        public IEnumerable<TOut> Map<TIn, TOut>(IEnumerable<TIn> source, bool? preserveReferences = null) {
+        public IEnumerable<TOut> MapTo<TIn, TOut>(IEnumerable<TIn> source, bool? preserveReferences = null) {
             if (source == null) return null;
 
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             return mapContext.MapToList<TIn, TOut>(source);
         }
 
-        public Dictionary<TOutKey, TOutValue> Map<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source, bool? preserveReferences = null) {
+        public Dictionary<TOutKey, TOutValue> MapTo<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source, bool? preserveReferences = null) {
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             return mapContext.MapToDictionary<TInKey, TInValue, TOutKey, TOutValue>(source);
         }

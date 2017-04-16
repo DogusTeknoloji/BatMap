@@ -64,14 +64,18 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ConfigurationTests.cs" />
+    <Compile Include="DTO\ForTestDTO.cs" />
     <Compile Include="DTO\AddressDTO.cs" />
     <Compile Include="DTO\CityDTO.cs" />
     <Compile Include="DTO\CompanyDTO.cs" />
+    <Compile Include="DTO\Country.cs" />
     <Compile Include="DTO\CustomerDTO.cs" />
     <Compile Include="DTO\OrderDTO.cs" />
     <Compile Include="DTO\OrderDetailDTO.cs" />
     <Compile Include="DTO\ProductDTO.cs" />
     <Compile Include="Model\Company.cs" />
+    <Compile Include="Model\Country.cs" />
+    <Compile Include="Model\ForTest.cs" />
     <Compile Include="StaticTests.cs" />
     <Compile Include="Model\Address.cs" />
     <Compile Include="Model\City.cs" />

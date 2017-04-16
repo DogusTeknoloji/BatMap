@@ -57,22 +57,7 @@ namespace BatMap {
 
             return retVal;
         }
-
-        public static Type GetUnderlyingType(this MemberInfo member) {
-            switch (member.MemberType) {
-                case MemberTypes.Event:
-                    return ((EventInfo)member).EventHandlerType;
-                case MemberTypes.Field:
-                    return ((FieldInfo)member).FieldType;
-                case MemberTypes.Method:
-                    return ((MethodInfo)member).ReturnType;
-                case MemberTypes.Property:
-                    return ((PropertyInfo)member).PropertyType;
-                default:
-                    throw new ArgumentException("Input MemberInfo must be if type EventInfo, FieldInfo, MethodInfo, or PropertyInfo");
-            }
-        }
-
+       
         public static IReadOnlyCollection<IncludePath> ParseIncludes(List<IEnumerable<string>> includes) {
             return includes
                 .Where(i => i.Any())
@@ -99,6 +84,10 @@ namespace BatMap {
             var h1 = o1.GetHashCode();
             var h2 = o2.GetHashCode();
             return ((h1 << 5) + h1) ^ h2;
+        }
+
+        public static int GenerateHashCode(object o1, object o2, object o3) {
+            return GenerateHashCode(GenerateHashCode(o1, o1), o3);
         }
 
         public static Func<TIn, MapContext, TOut> CreateMapper<TIn, TOut>(Expression<Func<TIn, MapContext, TOut>> expression) {
