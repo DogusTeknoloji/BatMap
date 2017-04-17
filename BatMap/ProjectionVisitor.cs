@@ -9,9 +9,6 @@ namespace BatMap {
         private readonly MapConfiguration _mapConfiguration;
         private readonly IEnumerable<IncludePath> _includes;
 
-        internal ProjectionVisitor(MapConfiguration mapConfiguration) : this(mapConfiguration, null) {
-        }
-
         internal ProjectionVisitor(MapConfiguration mapConfiguration, IEnumerable<IncludePath> includes) {
             _mapConfiguration = mapConfiguration;
             _includes = includes;
@@ -36,47 +33,54 @@ namespace BatMap {
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node) {
-            if (node.Method.DeclaringType == typeof(MapContext) && node.Method.Name == "Map") {
-                var inPrm = node.Arguments[0];
-                var inType = inPrm.Type;
-                var outType = node.Method.ReturnType;
+            if (node.Method.DeclaringType == typeof(MapContext)) {
+                if (node.Method.Name == "Map") {
+                    var inPrm = node.Arguments[0];
+                    var inType = inPrm.Type;
+                    var outType = node.Method.ReturnType;
 
-                if (_includes != null) {
-                    var path = Helper.GetMemberPath(inPrm as MemberExpression);
-                    if (path.Any() && GetIncludePath(path) == null) return Expression.Default(outType);
+                    if (_includes != null) {
+                        var path = Helper.GetMemberPath(inPrm as MemberExpression);
+                        if (path.Any() && GetIncludePath(path) == null) return Expression.Default(outType);
+                    }
+
+                    var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
+                    var projector = mapDefinition.Projector;
+                    var oldInPrm = projector.Parameters[0];
+
+                    var memberInit = (MemberInitExpression)projector.Body;
+                    var replaceParams = new Dictionary<ParameterExpression, Expression> {
+                        { oldInPrm, inPrm }
+                    };
+                    var parameterReplaceVisitor = new ParameterReplaceVisitor(replaceParams);
+                    return base.Visit(parameterReplaceVisitor.Visit(memberInit));
+                }
+                else if (node.Method.Name == "MapToList" || node.Method.Name == "MapToArray") {
+                    var retType = node.Method.ReturnType;
+                    var inPrm = node.Arguments[0];
+                    var genPrms = node.Method.GetGenericArguments();
+                    var inType = genPrms[0];
+                    var outType = genPrms[1];
+
+                    IncludePath memberIncludePath = null;
+                    if (_includes != null) {
+                        memberIncludePath = GetIncludePath(Helper.GetMemberPath(inPrm as MemberExpression));
+                        if (memberIncludePath == null) return Expression.Default(retType);
+                    }
+
+                    var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
+                    var subValue = new ProjectionVisitor(_mapConfiguration, memberIncludePath?.Children).VisitProjector(mapDefinition.Projector);
+                    var methodName = node.Method.Name.Substring(3);
+                    var subProjector = Expression.Call(typeof(Enumerable), "Select", new Type[] {
+                        node.Method.GetGenericArguments()[0],
+                        node.Method.GetGenericArguments()[1]
+                    }, node.Arguments[0], subValue);
+                    return Expression.Call(typeof(Enumerable), methodName, new Type[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
                 }
 
-                var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
-                var projector = mapDefinition.Projector;
-                var oldInPrm = projector.Parameters[0];
-
-                var memberInit = (MemberInitExpression)projector.Body;
-                var replaceParams = new Dictionary<ParameterExpression, Expression> {
-                    { oldInPrm, inPrm }
-                };
-                var parameterReplaceVisitor = new ParameterReplaceVisitor(replaceParams);
-                return base.Visit(parameterReplaceVisitor.Visit(memberInit));
-            }
-            else if (node.Method.DeclaringType == typeof(MapContext) && node.Method.Name == "MapToList") {
-                var retType = node.Method.ReturnType;
-                var inPrm = node.Arguments[0];
-                var genPrms = node.Method.GetGenericArguments();
-                var inType = genPrms[0];
-                var outType = genPrms[1];
-
-                IncludePath memberIncludePath = null;
-                if (_includes != null) {
-                    memberIncludePath = GetIncludePath(Helper.GetMemberPath(inPrm as MemberExpression));
-                    if (memberIncludePath == null) return Expression.Default(retType);
-                }
-
-                var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
-                var subValue = new ProjectionVisitor(_mapConfiguration, memberIncludePath?.Children).VisitProjector(mapDefinition.Projector);
-                var subProjector = Expression.Call(typeof(Enumerable), "Select", new Type[] {
-                    node.Method.GetGenericArguments()[0],
-                    node.Method.GetGenericArguments()[1]
-                }, node.Arguments[0], subValue);
-                return Expression.Call(typeof(Enumerable), "ToList", new Type[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
+                throw new InvalidOperationException(
+                    $"Projection does not support MapContext method '{node.Method.Name}', only 'Map', 'MapToList' and 'MapToArray' are supported."
+                );
             }
             else if (node.Method.DeclaringType == typeof(Enumerable) && node.Method.Name == "ToList") {
                 var retType = node.Method.ReturnType;
