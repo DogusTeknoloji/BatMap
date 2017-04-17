@@ -1,5 +1,4 @@
-## Environment data
-### BatMap version:
+## BatMap version
 
 
 ## Steps to reproduce
