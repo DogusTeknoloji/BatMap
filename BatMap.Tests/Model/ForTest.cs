@@ -11,6 +11,10 @@ namespace BatMap.Tests.Model {
     }
 
     public class ForTest3 {
+        public City[] Cities { get; set; }
+    }
+
+    public class ForTest4 {
         public Dictionary<int, Order> Orders { get; set; }
     }
 }

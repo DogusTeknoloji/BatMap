@@ -7,6 +7,7 @@ namespace BatMap.Tests.Model {
         public string CompanyName { get; set; }
         public string Phone { get; set; }
         public Address MainAddress { get; set; }
+        public int MainAddressId { get; set; }
         public ICollection<Address> Addresses { get; set; }
     }
 }

@@ -107,37 +107,37 @@ namespace BatMap.Tests {
 
         [Test]
         public void Map_Array_Property() {
-            var countries = Builder<Country>
+            var entities = Builder<ForTest3>
                 .CreateListOfSize(5)
                 .All()
                 .Do(c => {
                     c.Cities = Builder<City>.CreateListOfSize(10).Build().ToArray();
                 })
                 .Build();
-            countries[4].Cities = null;
+            entities[4].Cities = null;
 
             var config = new MapConfiguration();
-            config.RegisterMap<Country, CountryDTO>();
+            config.RegisterMap<ForTest3, ForTest3DTO>();
             config.RegisterMap<City, CityDTO>();
-            var countryDTOs = config.MapTo<Country, CountryDTO>(countries).ToList();
+            var dtos = config.Map<ForTest3, ForTest3DTO>(entities).ToList();
 
-            Assert.True(countryDTOs[3].Cities[2].Name == countries[3].Cities[2].Name);
-            Assert.IsNull(countryDTOs[4].Cities);
+            Assert.True(dtos[3].Cities[2].Name == entities[3].Cities[2].Name);
+            Assert.IsNull(dtos[4].Cities);
         }
 
         [Test]
         public void Register_With_Dictionary() {
             var config = new MapConfiguration();
-            config.RegisterMap<ForTest3, ForTest3DTO>();
+            config.RegisterMap<ForTest4, ForTest4DTO>();
             config.RegisterMap<Order, OrderDTO>();
 
-            var entity = new ForTest3 {
+            var entity = new ForTest4 {
                 Orders = new Dictionary<int, Order> {
                     {1, new Order { Id = 1 } },
                     {2, new Order { Id = 2 } }
                 }
             };
-            var dto = config.Map<ForTest3DTO>(entity);
+            var dto = config.Map<ForTest4DTO>(entity);
 
             Assert.AreEqual(dto.Orders[2].Id, 2);
         }
@@ -146,7 +146,7 @@ namespace BatMap.Tests {
         public void Map_Null_Dictionary_Returns_Null() {
             var config = new MapConfiguration();
 
-            Assert.IsNull(config.MapTo<int, Customer, int, CustomerDTO>(null));
+            Assert.IsNull(config.Map<int, Customer, int, CustomerDTO>(null));
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace BatMap.Tests {
             var config = new MapConfiguration();
 
             var dict = new Dictionary<int, Customer>();
-            Assert.AreEqual(config.MapTo<int, Customer, int, CustomerDTO>(dict).Count, 0);
+            Assert.AreEqual(config.Map<int, Customer, int, CustomerDTO>(dict).Count, 0);
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace BatMap.Tests {
             var customer = Builder<Customer>.CreateNew().Build();
             var dict = new Dictionary<Customer, int> { { customer, customer.Id } };
 
-            var dtoDict = config.MapTo<Customer, int, CustomerDTO, int>(dict);
+            var dtoDict = config.Map<Customer, int, CustomerDTO, int>(dict);
 
             Assert.AreEqual(customer.Id, dtoDict.First().Key.Id);
         }
@@ -183,7 +183,7 @@ namespace BatMap.Tests {
             orderDetail2.Product = product;
 
             var orderDetails = new List<OrderDetail> { orderDetail1, orderDetail2 };
-            var dtos = config.MapTo<OrderDetail, OrderDetailDTO>(orderDetails, true).ToList();
+            var dtos = config.Map<OrderDetail, OrderDetailDTO>(orderDetails, true).ToList();
 
             Assert.AreEqual(dtos[0].Product, dtos[1].Product);
         }
@@ -193,7 +193,7 @@ namespace BatMap.Tests {
             var config = new MapConfiguration();
             config.RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.Address, (c, mc) => mc.Map<Address, AddressDTO>(c.MainAddress)));
 
-            Assert.IsNull(config.Map<Customer, CustomerDTO>(null));
+            Assert.IsNull(config.Map<Customer, CustomerDTO>((Customer)null));
             Assert.IsNull(config.Map<Customer, CustomerDTO>(new Customer()).Address);
         }
 
@@ -234,7 +234,7 @@ namespace BatMap.Tests {
             var config = new MapConfiguration();
             config.RegisterMap<Customer, CustomerDTO>();
 
-            Assert.IsNull(config.MapTo<Customer, CustomerDTO>(null));
+            Assert.IsNull(config.Map<Customer, CustomerDTO>((IEnumerable<Customer>)null));
         }
     }
 }

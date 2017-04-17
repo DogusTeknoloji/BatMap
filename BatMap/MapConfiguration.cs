@@ -36,7 +36,7 @@ namespace BatMap {
             _preserveReferences = preserveReferences;
         }
 
-        #region Map Definition
+        #region Register
 
         public IMapDefinition RegisterMap(Type inType, Type outType) {
             return (IMapDefinition)_lazyRegisterMapMethod.Value.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
@@ -136,14 +136,14 @@ namespace BatMap {
             return mapper.DynamicInvoke(inObj, mapContext);
         }
 
-        public IEnumerable<TOut> MapTo<TIn, TOut>(IEnumerable<TIn> source, bool? preserveReferences = null) {
+        public IEnumerable<TOut> Map<TIn, TOut>(IEnumerable<TIn> source, bool? preserveReferences = null) {
             if (source == null) return null;
 
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             return mapContext.MapToList<TIn, TOut>(source);
         }
 
-        public Dictionary<TOutKey, TOutValue> MapTo<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source, bool? preserveReferences = null) {
+        public Dictionary<TOutKey, TOutValue> Map<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source, bool? preserveReferences = null) {
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             return mapContext.MapToDictionary<TInKey, TInValue, TOutKey, TOutValue>(source);
         }

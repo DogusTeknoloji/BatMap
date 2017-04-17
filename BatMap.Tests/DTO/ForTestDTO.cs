@@ -11,6 +11,10 @@ namespace BatMap.Tests.DTO {
     }
 
     public class ForTest3DTO {
+        public CityDTO[] Cities { get; set; }
+    }
+
+    public class ForTest4DTO {
         public Dictionary<int, OrderDTO> Orders { get; set; }
     }
 }
