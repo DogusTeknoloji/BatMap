@@ -2,6 +2,7 @@
 Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.
 
 [![Build Status](https://travis-ci.org/DogusTeknoloji/BatMap.svg?branch=master)](https://travis-ci.org/DogusTeknoloji/BatMap)
+<img src="https://ci.appveyor.com/api/projects/status/github/DogusTeknoloji/BatMap" />
 [![Coverage Status](https://coveralls.io/repos/github/DogusTeknoloji/BatMap/badge.svg?branch=master)](https://coveralls.io/github/DogusTeknoloji/BatMap?branch=master)
 [![Join the chat at https://gitter.im/NaNaNaNaBatMap/Lobby](https://badges.gitter.im/NaNaNaNaBatMap/Lobby.svg)](https://gitter.im/NaNaNaNaBatMap/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub stars](https://img.shields.io/github/stars/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/stargazers)
