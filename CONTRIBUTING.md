@@ -19,4 +19,4 @@ Unless we really loved the style, or we missed something out of the norm and you
 
 * Ask any question on [![https://gitter.im/NaNaNaNaBatMap/Lobby](https://badges.gitter.im/NaNaNaNaBatMap/Lobby.svg)](https://gitter.im/NaNaNaNaBatMap/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[Be a good OS citizen!](https://hackernoon.com/being-a-good-open-source-citizen-9060d0ab9732)
+[Be a good open source citizen!](https://hackernoon.com/being-a-good-open-source-citizen-9060d0ab9732)
