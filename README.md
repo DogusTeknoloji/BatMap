@@ -4,8 +4,10 @@ Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.
 [![Build Status](https://travis-ci.org/DogusTeknoloji/BatMap.svg?branch=master)](https://travis-ci.org/DogusTeknoloji/BatMap)
 [![Coverage Status](https://coveralls.io/repos/github/DogusTeknoloji/BatMap/badge.svg?branch=master)](https://coveralls.io/github/DogusTeknoloji/BatMap?branch=master)
 [![Join the chat at https://gitter.im/NaNaNaNaBatMap/Lobby](https://badges.gitter.im/NaNaNaNaBatMap/Lobby.svg)](https://gitter.im/NaNaNaNaBatMap/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![GitHub stars](https://img.shields.io/github/stars/badges/shields.svg?style=social&label=Star)](https://github.com/DogusTeknoloji/BatMap)
-[![GitHub forks](https://img.shields.io/github/forks/badges/shields.svg?style=social&label=Fork)](https://github.com/DogusTeknoloji/BatMap)
+[![GitHub stars](https://img.shields.io/github/stars/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/network)
+[![GitHub issues](https://img.shields.io/github/issues/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/issues)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/DogusTeknoloji/BatMap/master/LICENSE)
 
 Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/)):
 
