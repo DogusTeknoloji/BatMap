@@ -4,15 +4,15 @@
     <id>BatMap</id>
     <version>0.1</version>
     <title>BatMap: convention-based, fast object mapper</title>
-    <authors>Umut Özel</authors>
-    <owners>Doğuş Teknoloji</owners>
+    <authors>Umut Özel - Doğuş Teknoloji</authors>
+    <owners>Umut Özel - Doğuş Teknoloji</owners>
     <licenseUrl>https://github.com/DogusTeknoloji/BatMap/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/DogusTeknoloji/BatMap</projectUrl>
     <iconUrl>https://image.ibb.co/itRs6Q/logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>BatMap - The Mapper we deserve, not the one we need. Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.</description>
     <summary>Convention-based, fast object mapper.</summary>
-    <copyright>Copyright (c) 2017 Doğuş Teknoloji</copyright>
+    <copyright>Copyright (c) 2017</copyright>
     <language>en-US</language>
     <tags>Mapper Projector Mapping Entity DTO</tags>
   </metadata>
