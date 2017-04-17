@@ -1,5 +1,10 @@
+version: 0.1.{build}
+
 before_build:
   - nuget restore
+
+configuration: Release
+
 deploy:
   provider: NuGet
   api_key:
