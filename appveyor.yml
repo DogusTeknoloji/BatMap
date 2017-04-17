@@ -1,9 +1,12 @@
 version: 0.1.{build}
+configuration: Release
 
 before_build:
   - nuget restore
-
-configuration: Release
+  
+after_build:
+- nuget pack BatMap\BatMap.nuspec -Version %appveyor_build_version%
+- appveyor PushArtifact BatMap.%appveyor_build_version%.nupkg
 
 deploy:
   provider: NuGet
