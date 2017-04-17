@@ -1,2 +1,8 @@
 before_build:
   - nuget restore
+deploy:
+  provider: NuGet
+  api_key:
+    secure: hQY0HMU8ADJvqFfivG/Z0+h2Nz8xFCFd64ERHhaTFc3SzRy3Kz8C3FE8tiJMqMjz
+  skip_symbols: false
+  artifact: /.*\.nupkg/
