@@ -157,16 +157,20 @@ namespace BatMap.Tests {
             mockList.Setup(m => m.Include(It.IsAny<string>())).Returns(mockList.Object);
             mockList.Setup(m => m.Local).Returns(list);
             mockList.Setup(m => m.Add(It.IsAny<T>())).Returns((T a) => {
-                list.Add(a); return a;
+                list.Add(a);
+                return a;
             });
             mockList.Setup(m => m.AddRange(It.IsAny<IEnumerable<T>>())).Returns((IEnumerable<T> a) => {
-                foreach (var item in a.ToArray()) list.Add(item); return a;
+                foreach (var item in a.ToArray()) list.Add(item);
+                return a;
             });
             mockList.Setup(m => m.Remove(It.IsAny<T>())).Returns((T a) => {
-                list.Remove(a); return a;
+                list.Remove(a);
+                return a;
             });
             mockList.Setup(m => m.RemoveRange(It.IsAny<IEnumerable<T>>())).Returns((IEnumerable<T> a) => {
-                foreach (var item in a.ToArray()) list.Remove(item); return a;
+                foreach (var item in a.ToArray()) list.Remove(item);
+                return a;
             });
 
             return mockList;

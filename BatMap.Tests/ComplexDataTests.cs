@@ -62,6 +62,22 @@ namespace BatMap.Tests {
         }
 
         [Test]
+        public void Map_Orders_PreserveReferences_2() {
+            var config = new MapConfiguration(DynamicMapping.MapAndCache);
+
+            var order = Builder<Order>.CreateNew().Build();
+            var orderDetail = Builder<OrderDetail>.CreateNew().Build();
+
+            order.OrderDetails = new List<OrderDetail>();
+            order.OrderDetails.Add(orderDetail);
+            orderDetail.Order = order;
+
+            var orderDto = config.Map<OrderDTO>(order, true);
+
+            Assert.AreEqual(orderDto, orderDto.OrderDetails.First().Order);
+        }
+
+        [Test]
         public void Map_Orders_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
