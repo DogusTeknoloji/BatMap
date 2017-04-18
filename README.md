@@ -80,4 +80,4 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 PM> Install-Package BatMap
 ```
 
-Developed with :heartbeat: at [Doğuş Teknoloji](http://www.d-teknoloji.com.tr).
+Developed with :heart: at [Doğuş Teknoloji](http://www.d-teknoloji.com.tr).
