@@ -58,18 +58,6 @@ namespace BatMap {
 
         #region Projection
 
-        public static IEnumerable<TOut> ProjectTo<TIn, TOut>(this IEnumerable<TIn> source, bool includeNavigations = true) {
-            return DefaultConfig.ProjectTo<TIn, TOut>(source, includeNavigations);
-        }
-
-        public static IEnumerable<TOut> ProjectTo<TIn, TOut>(this IEnumerable<TIn> source, params Expression<Func<TIn, object>>[] includes) {
-            return DefaultConfig.ProjectTo<TIn, TOut>(source, includes);
-        }
-
-        public static IEnumerable<TOut> ProjectTo<TIn, TOut>(this IEnumerable<TIn> source, params IncludePath[] includes) {
-            return DefaultConfig.ProjectTo<TIn, TOut>(source, includes);
-        }
-
         public static IQueryable<TOut> ProjectTo<TOut>(this IQueryable query, bool checkIncludes = true) {
             return DefaultConfig.ProjectTo<TOut>(query, checkIncludes);
         }

@@ -155,23 +155,7 @@ namespace BatMap {
         #endregion
 
         #region Projection
-
-        public IEnumerable<TOut> ProjectTo<TIn, TOut>(IEnumerable<TIn> source, bool includeNavigations = true) {
-            return ProjectToImpl(source, GetProjector<TIn, TOut>(includeNavigations));
-        }
-
-        public IEnumerable<TOut> ProjectTo<TIn, TOut>(IEnumerable<TIn> source, params Expression<Func<TIn, object>>[] includes) {
-            return ProjectToImpl(source, GetProjector<TIn, TOut>(includes));
-        }
-
-        public IEnumerable<TOut> ProjectTo<TIn, TOut>(IEnumerable<TIn> source, params IncludePath[] includes) {
-            return ProjectToImpl(source, GetProjector<TIn, TOut>(includes));
-        }
-
-        private IEnumerable<TOut> ProjectToImpl<TIn, TOut>(IEnumerable<TIn> source, Expression<Func<TIn, TOut>> projector) {
-            return source.Select(Helper.CreateProjector(projector));
-        }
-
+        
         public IQueryable<TOut> ProjectTo<TOut>(IQueryable query, bool checkIncludes = true) {
             return ProjectToImpl<TOut>(query, checkIncludes ? new IncludeVisitor().GetIncludes(query) : null);
         }
