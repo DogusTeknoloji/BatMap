@@ -78,6 +78,32 @@ namespace BatMap.Tests {
         }
 
         [Test]
+        public void Map_Orders_With_SkipMember() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Order, OrderDTO>(b => {
+                b.SkipMember(o => o.Price);
+            });
+
+            var order = Builder<Order>.CreateNew().Build();
+            var orderDto = config.Map<OrderDTO>(order);
+
+            Assert.AreNotEqual(order.Price, orderDto.Price);
+        }
+
+        [Test]
+        public void Map_Orders_With_MapMember() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Order, OrderDTO>(b => {
+                b.MapMember(o => o.Price, (o, mc) => o.Price * 3);
+            });
+
+            var order = Builder<Order>.CreateNew().Build();
+            var orderDto = config.Map<OrderDTO>(order);
+
+            Assert.AreEqual(order.Price * 3, orderDto.Price);
+        }
+
+        [Test]
         public void Map_Orders_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
