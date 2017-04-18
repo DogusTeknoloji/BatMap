@@ -4,7 +4,6 @@
 [![Build Status](https://travis-ci.org/DogusTeknoloji/BatMap.svg?branch=master)](https://travis-ci.org/DogusTeknoloji/BatMap)
 [![Build status](https://ci.appveyor.com/api/projects/status/fm2snjwobq0k7r9u?svg=true)](https://ci.appveyor.com/project/DogusTeknoloji/batmap)
 [![NuGet Badge](https://buildstats.info/nuget/BatMap)](https://www.nuget.org/packages/BatMap/)
-[![Coverage Status](https://coveralls.io/repos/github/DogusTeknoloji/BatMap/badge.svg?branch=master)](https://coveralls.io/github/DogusTeknoloji/BatMap?branch=master)
 [![Join the chat at https://gitter.im/NaNaNaNaBatMap/Lobby](https://badges.gitter.im/NaNaNaNaBatMap/Lobby.svg)](https://gitter.im/NaNaNaNaBatMap/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub stars](https://img.shields.io/github/stars/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/network)
