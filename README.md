@@ -1,5 +1,5 @@
 # BatMap - The Mapper we deserve, not the one we need.
-> > > <img src="https://image.ibb.co/jDUyWQ/logo_64x64.png" alt="🦇 BatMap" align="middle"> **Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.**
+<img src="https://image.ibb.co/jDUyWQ/logo_64x64.png" alt="🦇 BatMap" align="middle"> **Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.**
 
 [![Build Status](https://travis-ci.org/DogusTeknoloji/BatMap.svg?branch=master)](https://travis-ci.org/DogusTeknoloji/BatMap)
 [![Build status](https://ci.appveyor.com/api/projects/status/fm2snjwobq0k7r9u?svg=true)](https://ci.appveyor.com/project/DogusTeknoloji/batmap)
@@ -79,5 +79,8 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 ```
 PM> Install-Package BatMap
 ```
+
+## Documentation
+You might want to visit [wiki](./wiki) for more.
 
 Developed with :heart: at [Doğuş Teknoloji](http://www.d-teknoloji.com.tr).
