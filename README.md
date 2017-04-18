@@ -72,4 +72,12 @@ customerQuery.ProjectTo<Customer, CustomerDTO>(c => c.Addresses, c => c.Orders);
 
 Note: If you want to change mapping behavior, create a class that inherits from ExpressionProvider, override CreateMemberBinding and inject an instance of your class to MapConfiguration.
 
+### Where can I get it?
+
+First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [BatMap](https://www.nuget.org/packages/BatMap/) from the package manager console:
+
+```
+PM> Install-Package BatMap
+```
+
 Developed with :heartbeat: at [Doğuş Teknoloji](http://www.d-teknoloji.com.tr).
