@@ -137,30 +137,5 @@ namespace BatMap.Tests {
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
-
-        [Test]
-        public void GetProjector() {
-            var projector = Mapper.GetProjector<Customer, CustomerDTO>(false);
-            var dtos = Customers.Select(projector.Compile());
-
-            Assert.AreEqual(dtos.Count(), Customers.Count);
-        }
-
-        [Test]
-        public void GetProjector_WithExpression() {
-            var projector = Mapper.GetProjector<Customer, CustomerDTO>(c => c.Addresses);
-            var dtos = Customers.Select(projector.Compile());
-
-            Assert.AreEqual(dtos.Count(), Customers.Count);
-        }
-
-
-        [Test]
-        public void GetProjector_WithInclude() {
-            var projector = Mapper.GetProjector<Customer, CustomerDTO>(new IncludePath("Addresses"));
-            var dtos = Customers.Select(projector.Compile());
-
-            Assert.AreEqual(dtos.Count(), Customers.Count);
-        }
     }
 }

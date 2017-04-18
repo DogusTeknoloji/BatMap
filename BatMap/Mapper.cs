@@ -82,18 +82,6 @@ namespace BatMap {
             return DefaultConfig.ProjectTo<TOut>(query, includes);
         }
 
-        public static Expression<Func<TIn, TOut>> GetProjector<TIn, TOut>(bool includeNavigations = true) {
-            return DefaultConfig.GetProjector<TIn, TOut>(includeNavigations);
-        }
-
-        public static Expression<Func<TIn, TOut>> GetProjector<TIn, TOut>(params Expression<Func<TIn, object>>[] includes) {
-            return DefaultConfig.GetProjector<TIn, TOut>(includes);
-        }
-
-        public static Expression<Func<TIn, TOut>> GetProjector<TIn, TOut>(params IncludePath[] includes) {
-            return DefaultConfig.GetProjector<TIn, TOut>(includes);
-        }
-
         #endregion
     }
 }
