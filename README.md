@@ -5,12 +5,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/fm2snjwobq0k7r9u?svg=true)](https://ci.appveyor.com/project/DogusTeknoloji/batmap)
 [![NuGet Badge](https://buildstats.info/nuget/BatMap)](https://www.nuget.org/packages/BatMap/)
 [![Join the chat at https://gitter.im/NaNaNaNaBatMap/Lobby](https://badges.gitter.im/NaNaNaNaBatMap/Lobby.svg)](https://gitter.im/NaNaNaNaBatMap/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![GitHub stars](https://img.shields.io/github/stars/bevacqua/awesome-badges.svg?style=social&label=Star)](https://github.com/DogusTeknoloji/BatMap)
-[![GitHub forks](https://img.shields.io/github/forks/bevacqua/awesome-badges.svg?style=social&label=Fork)](https://github.com/DogusTeknoloji/BatMap)
-[![GitHub stars](https://img.shields.io/github/stars/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/network)
 [![GitHub issues](https://img.shields.io/github/issues/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/issues)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/DogusTeknoloji/BatMap/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/bevacqua/awesome-badges.svg?style=social&label=Star)](https://github.com/DogusTeknoloji/BatMap)
+[![GitHub forks](https://img.shields.io/github/forks/bevacqua/awesome-badges.svg?style=social&label=Fork)](https://github.com/DogusTeknoloji/BatMap)
 
 Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/)):
 
