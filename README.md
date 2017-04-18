@@ -83,4 +83,6 @@ PM> Install-Package BatMap
 ## Documentation
 You might want to visit [wiki](./wiki) for more.
 
+***
+
 Developed with :heart: at [Doğuş Teknoloji](http://www.d-teknoloji.com.tr).
