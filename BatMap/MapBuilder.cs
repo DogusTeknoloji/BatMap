@@ -7,13 +7,13 @@ namespace BatMap {
 
     public sealed class MapBuilder<TIn, TOut> : IMapBuilder<MapBuilder<TIn, TOut>, TIn, TOut> {
         private readonly Dictionary<MapMember, LambdaExpression> _expressions = new Dictionary<MapMember, LambdaExpression>();
-        private readonly ExpressionProvider _expressionProvider;
+        private readonly IExpressionProvider _expressionProvider;
         private readonly Type _inType;
         private readonly Type _outType;
         private readonly IList<MapMember> _inMembers;
         private readonly IList<MapMember> _outMembers;
 
-        public MapBuilder(ExpressionProvider expressionProvider) {
+        public MapBuilder(IExpressionProvider expressionProvider) {
             _expressionProvider = expressionProvider;
 
             _inType = typeof(TIn);

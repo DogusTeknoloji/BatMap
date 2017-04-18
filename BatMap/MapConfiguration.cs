@@ -10,7 +10,7 @@ namespace BatMap {
         private static readonly Lazy<MethodInfo> _lazyRegisterMapMethod;
         private static readonly Lazy<MethodInfo> _lazyGenerateMapDefinitionMethod;
         private readonly Dictionary<int, IMapDefinition> _mapDefinitions = new Dictionary<int, IMapDefinition>();
-        private readonly ExpressionProvider _expressionProvider;
+        private readonly IExpressionProvider _expressionProvider;
         private readonly DynamicMapping _dynamicMapping;
         private readonly bool _preserveReferences;
 
@@ -27,10 +27,14 @@ namespace BatMap {
             });
         }
 
-        public MapConfiguration(DynamicMapping dynamicMapping = DynamicMapping.NotAllowed, bool preserveReferences = false) : this(new ExpressionProvider(), dynamicMapping, preserveReferences) {
+        public MapConfiguration(DynamicMapping dynamicMapping = DynamicMapping.NotAllowed, 
+                                bool preserveReferences = false) 
+            : this(ExpressionProvider.Instance, dynamicMapping, preserveReferences) {
         }
 
-        public MapConfiguration(ExpressionProvider expressionProvider, DynamicMapping dynamicMapping = DynamicMapping.NotAllowed, bool preserveReferences = false) {
+        public MapConfiguration(IExpressionProvider expressionProvider, 
+                                DynamicMapping dynamicMapping = DynamicMapping.NotAllowed, 
+                                bool preserveReferences = false) {
             _expressionProvider = expressionProvider;
             _dynamicMapping = dynamicMapping;
             _preserveReferences = preserveReferences;

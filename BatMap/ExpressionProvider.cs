@@ -6,7 +6,8 @@ using System.Reflection;
 
 namespace BatMap {
 
-    public class ExpressionProvider {
+    public class ExpressionProvider: IExpressionProvider {
+        private static readonly Lazy<ExpressionProvider> _lazyInstance = new Lazy<ExpressionProvider>();
         protected static readonly MethodInfo MapMethod;
         protected static readonly MethodInfo MapToListMethod;
         protected static readonly MethodInfo MapToArrayMethod;
@@ -18,6 +19,12 @@ namespace BatMap {
             MapToListMethod = type.GetMethod("MapToList");
             MapToArrayMethod = type.GetMethod("MapToArray");
             MapToDictionaryMethod = type.GetMethod("MapToDictionary");
+        }
+
+        internal static ExpressionProvider Instance {
+            get {
+                return _lazyInstance.Value;
+            }
         }
 
         public virtual MemberBinding CreateMemberBinding(MapMember outMember, MapMember inMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
@@ -77,5 +84,10 @@ namespace BatMap {
                 )
             );
         }
+    }
+
+    public interface IExpressionProvider {
+
+        MemberBinding CreateMemberBinding(MapMember outMember, MapMember inMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm);
     }
 }
