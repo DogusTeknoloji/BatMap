@@ -81,7 +81,7 @@ PM> Install-Package BatMap
 ```
 
 ## Documentation
-You might want to visit [wiki](./wiki) for more.
+You might want to visit [wiki](https://github.com/DogusTeknoloji/BatMap/wiki) for more.
 
 ***
 
