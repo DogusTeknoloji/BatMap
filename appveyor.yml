@@ -1,3 +1,9 @@
+only_commits:
+  files:
+    - BatMap/
+    - BatMap.Benchmark/
+    - BatMap.Tests/
+
 configuration: Release
 
 assembly_info:
