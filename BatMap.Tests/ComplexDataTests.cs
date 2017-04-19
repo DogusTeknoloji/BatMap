@@ -133,6 +133,50 @@ namespace BatMap.Tests {
         }
 
         [Test]
+        public void Project_Orders_With_Navigations() {
+            var config = new MapConfiguration(DynamicMapping.MapAndCache);
+            config.RegisterMap<OrderDetail, OrderDetailDTO>(b => b.SkipMember(od => od.Order));
+            config.RegisterMap<Product, ProductDTO>(b => b.SkipMember(p => p.Supplier));
+
+            var projector = config.GetProjector<Order, OrderDTO>();
+            var func = Helper.CreateProjector(projector);
+            var dtoList = _orders.Select(func).ToList();
+
+            Assert.AreEqual(
+                dtoList[3].OrderDetails.ToList()[2].Product.Id,
+                _orders[3].OrderDetails[2].Product.Id
+            );
+        }
+
+        [Test]
+        public void Project_Orders_Without_Navigations() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Order, OrderDTO>();
+
+            var projector = config.GetProjector<Order, OrderDTO>(false);
+            var func = Helper.CreateProjector(projector);
+            var dtoList = _orders.Select(func).ToList();
+
+            Assert.IsNull(dtoList[3].OrderDetails);
+        }
+
+        [Test]
+        public void Project_Orders_With_IncludePath() {
+            var config = new MapConfiguration(DynamicMapping.MapAndCache);
+
+            var projector = config.GetProjector<Order, OrderDTO>(new IncludePath("OrderDetails"));
+            var func = Helper.CreateProjector(projector);
+            var dtoList = _orders.Select(func).ToList();
+
+            Assert.AreEqual(
+                dtoList[3].OrderDetails.ToList()[2].Id,
+                _orders[3].OrderDetails[2].Id
+            );
+
+            Assert.IsNull(dtoList[3].OrderDetails.ToList()[2].Product);
+        }
+
+        [Test]
         public void Project_Orders_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
@@ -148,7 +192,9 @@ namespace BatMap.Tests {
             config.RegisterMap<Product, ProductDTO>();
             config.RegisterMap<Company, CompanyDTO>();
 
-            var dtoList = config.ProjectTo<Order, OrderDTO>(_orders, o => o.OrderDetails.Select(od => od.Product.Supplier)).ToList();
+            var projector = config.GetProjector<Order, OrderDTO>(o => o.OrderDetails.Select(od => od.Product.Supplier));
+            var func = Helper.CreateProjector(projector);
+            var dtoList = _orders.Select(func).ToList();
 
             Assert.AreEqual(
                 dtoList[3].OrderDetails.ToList()[2].SubPrice,
@@ -174,7 +220,9 @@ namespace BatMap.Tests {
             config.RegisterMap<Product, ProductDTO>();
             config.RegisterMap<Company, CompanyDTO>();
 
-            var dtoList = config.ProjectTo<Order, OrderDTO>(_orders, o => o.OrderDetails.Select(od => od.Product.Supplier)).ToList();
+            var projector = config.GetProjector<Order, OrderDTO>(o => o.OrderDetails.Select(od => od.Product.Supplier));
+            var func = Helper.CreateProjector(projector);
+            var dtoList = _orders.Select(func).ToList();
 
             Assert.AreEqual(
                 dtoList[3].Price,
@@ -200,7 +248,9 @@ namespace BatMap.Tests {
             config.RegisterMap<Company, CompanyDTO>();
 
             Assert.Throws<InvalidOperationException>(() => {
-                var dtoList = config.ProjectTo<Order, OrderDTO>(_orders, o => o.OrderDetails.Select(od => od.Product.Supplier)).ToList();
+                var projector = config.GetProjector<Order, OrderDTO>(o => o.OrderDetails.Select(od => od.Product.Supplier));
+                var func = Helper.CreateProjector(projector);
+                var dtoList = _orders.Select(func).ToList();
             });
         }
     }

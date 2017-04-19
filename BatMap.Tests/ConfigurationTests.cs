@@ -230,7 +230,7 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void MapTo_With_Null() {
+        public void Map_Enumerable_With_Null() {
             var config = new MapConfiguration();
             config.RegisterMap<Customer, CustomerDTO>();
 

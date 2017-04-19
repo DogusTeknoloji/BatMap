@@ -94,28 +94,7 @@ namespace BatMap.Tests {
 
             Assert.IsTrue(dtoDict.All(kvp => kvp.Key == kvp.Value.Id));
         }
-
-        [Test]
-        public void Enumerable_ProjectTo() {
-            var dtos = Customers.ProjectTo<Customer, CustomerDTO>(false);
-
-            Assert.AreEqual(dtos.Count(), Customers.Count);
-        }
-
-        [Test]
-        public void Enumerable_ProjectToWithExpression() {
-            var dtos = Customers.ProjectTo<Customer, CustomerDTO>(c => c.Addresses);
-
-            Assert.AreEqual(dtos.Count(), Customers.Count);
-        }
-
-        [Test]
-        public void Enumerable_ProjectToWithInclude() {
-            var dtos = Customers.ProjectTo<Customer, CustomerDTO>(new IncludePath("Addresses"));
-
-            Assert.AreEqual(dtos.Count(), Customers.Count);
-        }
-
+       
         [Test]
         public void Queryable_ProjectTo() {
             var dtos = Customers.AsQueryable().ProjectTo<CustomerDTO>(true);
@@ -129,7 +108,6 @@ namespace BatMap.Tests {
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
-
 
         [Test]
         public void Queryable_ProjectToWithInclude() {
