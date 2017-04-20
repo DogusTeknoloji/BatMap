@@ -28,7 +28,7 @@ after_build:
 
 test_script:
 - ps: >-
-    .\packages\OpenCover.*\tools\OpenCover.Console.exe -register:user -target:.\packages\NUnit.ConsoleRunner.*\tools\nunit3-console.exe -targetargs:".\BatMap.Tests\bin\$env:CONFIGURATION\BatMap.Tests.dll /noshadow -filter:"+[BatMap*]*" -output:opencoverCoverage.xml
+    .\packages\OpenCover.*\tools\OpenCover.Console.exe -register:user -target:.\packages\NUnit.ConsoleRunner.*\tools\nunit3-console.exe -targetargs:.\BatMap.Tests\bin\$env:CONFIGURATION\BatMap.Tests.dll /noshadow -filter:"+[BatMap*]*" -output:opencoverCoverage.xml
     
     $coveralls = (Resolve-Path "./packages/coveralls.net.*/tools/csmacnz.Coveralls.exe").ToString()
     $env:APPVEYOR_BUILD_NUMBER
