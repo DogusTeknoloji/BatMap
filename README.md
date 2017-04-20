@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/DogusTeknoloji/BatMap.svg?branch=master)](https://travis-ci.org/DogusTeknoloji/BatMap)
 [![Build status](https://ci.appveyor.com/api/projects/status/fm2snjwobq0k7r9u?svg=true)](https://ci.appveyor.com/project/DogusTeknoloji/batmap)
-[<img src="https://image.ibb.co/iuTWJ5/test_coverage.png">](https://image.ibb.co/mN2DWQ/test_coverage.png)
+[![Coverage Status](https://coveralls.io/repos/github/DogusTeknoloji/BatMap/badge.svg?branch=master)](https://coveralls.io/github/DogusTeknoloji/BatMap?branch=master)
 [![NuGet Badge](https://buildstats.info/nuget/BatMap)](https://www.nuget.org/packages/BatMap/)
 [![Join the chat at https://gitter.im/NaNaNaNaBatMap/Lobby](https://badges.gitter.im/NaNaNaNaBatMap/Lobby.svg)](https://gitter.im/NaNaNaNaBatMap/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub issues](https://img.shields.io/github/issues/DogusTeknoloji/BatMap.svg)](https://github.com/DogusTeknoloji/BatMap/issues)
