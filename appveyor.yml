@@ -29,8 +29,7 @@ after_build:
 test_script:
 - ps: >-
     .\packages\OpenCover.*\tools\OpenCover.Console.exe -register:user -target:.\packages\NUnit.ConsoleRunner.*\tools\nunit3-console.exe -targetargs:.\BatMap.Tests\bin\$env:CONFIGURATION\BatMap.Tests.dll -filter:"+[BatMap*]*" -output:opencoverCoverage.xml
-    $coveralls = (Resolve-Path "./packages/coveralls.net.*/tools/csmacnz.Coveralls.exe").ToString()
-    $coveralls --opencover -i opencoverCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --useRelativePaths --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_BUILD_NUMBER --serviceName appveyor
+    ./packages/coveralls.net.*/tools/csmacnz.Coveralls.exe --opencover -i opencoverCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --useRelativePaths --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_BUILD_NUMBER --serviceName appveyor
 
 deploy:
   provider: NuGet
