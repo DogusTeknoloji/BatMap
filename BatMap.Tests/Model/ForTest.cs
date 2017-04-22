@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatMap.Tests.Model {
 
     public class ForTest1 {
+        [ExcludeFromCodeCoverage]
         public Address Address { get; set; }
     }
 

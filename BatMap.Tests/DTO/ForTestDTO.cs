@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BatMap.Tests.DTO {
 
     public class ForTest1DTO {
+        [ExcludeFromCodeCoverage]
         public IList<AddressDTO> Address { get; set; }
     }
 
