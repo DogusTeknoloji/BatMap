@@ -248,9 +248,7 @@ namespace BatMap.Tests {
             config.RegisterMap<Company, CompanyDTO>();
 
             Assert.Throws<InvalidOperationException>(() => {
-                var projector = config.GetProjector<Order, OrderDTO>(o => o.OrderDetails.Select(od => od.Product.Supplier));
-                var func = Helper.CreateProjector(projector);
-                var dtoList = _orders.Select(func).ToList();
+                config.GetProjector<Order, OrderDTO>(o => o.OrderDetails.Select(od => od.Product.Supplier));
             });
         }
     }
