@@ -42,14 +42,27 @@ namespace BatMap {
             var inType = typeof(TIn);
             var outType = typeof(TOut);
 
-            var count = source.Count();
-            var retVal = new List<TOut>(count);
-            if (count == 0) return retVal;
+            List<TOut> retVal;
+            var sourceList = source as IList<TIn>;
+            if (sourceList != null) {
+                var count = sourceList.Count;
+                retVal = new List<TOut>(count);
+                if (count == 0) return retVal;
 
-            var mapDefinition = (IMapDefinition<TIn, TOut>)_mapper.GetMapDefinition(inType, outType);
-            var mapper = PreserveReferences ? mapDefinition.MapperWithCache : mapDefinition.Mapper;
-            foreach (var i in source) {
-                retVal.Add(mapper(i, this));
+                var mapDefinition = (IMapDefinition<TIn, TOut>) _mapper.GetMapDefinition(inType, outType);
+                var mapper = PreserveReferences ? mapDefinition.MapperWithCache : mapDefinition.Mapper;
+                for (var i = 0; i < count; i++) {
+                    retVal.Add(mapper(sourceList[i], this));
+                }
+            }
+            else {
+                retVal = new List<TOut>();
+
+                var mapDefinition = (IMapDefinition<TIn, TOut>)_mapper.GetMapDefinition(inType, outType);
+                var mapper = PreserveReferences ? mapDefinition.MapperWithCache : mapDefinition.Mapper;
+                foreach (var i in source) {
+                    retVal.Add(mapper(i, this));
+                }
             }
 
             return retVal;
