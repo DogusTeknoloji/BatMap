@@ -13,42 +13,47 @@ namespace BatMap.Tests {
 
         [Test]
         public void Unregistered_Generic_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() => {
+            var exception = Assert.Throws<InvalidOperationException>(() => {
                 var config = new MapConfiguration();
                 config.Map<CustomerDTO>(new Customer());
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
         public void Unregistered_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() => {
+            var exception = Assert.Throws<InvalidOperationException>(() => {
                 var config = new MapConfiguration();
                 config.Map(new Customer());
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
         public void Register_With_Non_Member_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() => {
+            var exception = Assert.Throws<InvalidOperationException>(() => {
                 var config = new MapConfiguration();
                 config.RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.Addresses.Count > 0, (c, mc) => c.CompanyName.Length > 0));
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
         public void Register_With_Not_Owned_Member_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() => {
+            var exception = Assert.Throws<InvalidOperationException>(() => {
                 var config = new MapConfiguration();
                 config.RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.Address.Detail, (c, mc) => c.CompanyName));
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
         public void Register_With_Invalid_Member_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() => {
+            var exception = Assert.Throws<InvalidOperationException>(() => {
                 var config = new MapConfiguration();
                 config.RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.OrderCount, (c, mc) => c.CompanyName.Length));
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
@@ -70,18 +75,20 @@ namespace BatMap.Tests {
 
         [Test]
         public void Register_Single_To_Many_Throws_Exception() {
-            Assert.Throws<ArrayTypeMismatchException>(() => {
+            var exception = Assert.Throws<ArrayTypeMismatchException>(() => {
                 var config = new MapConfiguration();
                 config.RegisterMap<ForTest1, ForTest1DTO>();
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
         public void Register_Many_To_Single_Throws_Exception() {
-            Assert.Throws<ArrayTypeMismatchException>(() => {
+            var exception = Assert.Throws<ArrayTypeMismatchException>(() => {
                 var config = new MapConfiguration();
                 config.RegisterMap<ForTest1DTO, ForTest1>();
             });
+            Assert.That(exception.Message, Is.Not.Null.Or.Empty);
         }
 
         [Test]
@@ -103,6 +110,17 @@ namespace BatMap.Tests {
             var dto = config.Map<CustomerDTO>(customer);
 
             Assert.AreEqual(dto.Orders.Count, 0);
+        }
+
+        [Test]
+        public void Map_With_NonList() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Customer, CustomerDTO>();
+
+            var customers = Builder<Customer>.CreateListOfSize(5).Build().Select(c => c);
+            var dtos = config.Map<Customer, CustomerDTO>(customers);
+
+            Assert.AreEqual(dtos.Count(), 5);
         }
 
         [Test]
