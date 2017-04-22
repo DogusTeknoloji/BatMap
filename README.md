@@ -16,14 +16,14 @@ Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkD
 
 |        Method |      Mean |
 |-------------- |---------- |
-|        BatMap :boom:| 1.8563 ms :boom:|
-|       Mapster | 2.0414 ms |
-|    SafeMapper | 2.0589 ms |
-|   HandWritten | 2.1000 ms |
-|    AutoMapper | 2.7422 ms |
-|    TinyMapper | 2.8609 ms |
-| ExpressMapper | 4.9961 ms |
-|    FastMapper | 5.7874 ms |
+|        BatMap :boom:| 1.3309 ms :boom:|
+|       Mapster | 2.0377 ms |
+|    SafeMapper | 2.0371 ms |
+|   HandWritten | 2.1175 ms |
+|    AutoMapper | 2.6187 ms |
+|    TinyMapper | 2.8119 ms |
+| ExpressMapper | 5.0814 ms |
+|    FastMapper | 5.9380 ms |
 
 <sup>Results may (probably) vary</sup>
     
