@@ -10,7 +10,7 @@ using FizzWare.NBuilder;
 namespace BatMap.Benchmark {
 
     public class Program {
-        static IList<Customer> _customers;
+        private static readonly IList<Customer> _customers;
 
         static Program() {
             var rnd = new Random();
@@ -65,7 +65,7 @@ namespace BatMap.Benchmark {
             Nelibur.ObjectMapper.TinyMapper.Bind<OrderDetail, OrderDetailDTO>();
         }
 
-        static void Main(string[] args) {
+        static void Main() {
             var summary = BenchmarkRunner.Run<Program>();
             //ManualTest();
         }
