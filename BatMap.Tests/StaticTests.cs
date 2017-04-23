@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder.Spatial;
 using System.Linq;
-using FizzWare.NBuilder;
+using System.Linq.Expressions;
+using System.Reflection;
 using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
+using FizzWare.NBuilder;
 using NUnit.Framework;
 
 namespace BatMap.Tests {
@@ -29,6 +32,22 @@ namespace BatMap.Tests {
                     c.MainAddress = addresses[0];
                 })
                 .Build();
+        }
+
+        [Test]
+        public void Static_Availability_Test() {
+            // check if all instance methods are also available as static API and static API does not have any extra method
+            var skipMethods = new[] { "GetProjector", "GetMapDefinition", "GenerateMapDefinition" };
+            var instanceMethods = typeof(MapConfiguration).GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m => !skipMethods.Contains(m.Name) && m.DeclaringType != typeof(object))
+                .ToList();
+            var staticMethods = typeof(Mapper).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList();
+            
+            Assert.IsTrue(instanceMethods.Count == staticMethods.Count 
+                && instanceMethods.All(m => staticMethods.Any(sm =>
+                    m.Name == sm.Name && m.ToString() == sm.ToString()
+                ))
+            );
         }
 
         [Test]
