@@ -91,7 +91,7 @@ namespace BatMap {
         }
     }
 
-    public interface IMapBuilder<TImplementor, TIn, TOut> where TImplementor : IMapBuilder<TImplementor, TIn, TOut> {
+    public interface IMapBuilder<out TImplementor, TIn, TOut> where TImplementor : IMapBuilder<TImplementor, TIn, TOut> {
         TImplementor SkipMember<TResult>(Expression<Func<TOut, TResult>> selector);
         TImplementor MapMember<TResult>(Expression<Func<TOut, TResult>> selector, Expression<Func<TIn, MapContext, TResult>> assigner);
         Expression<Func<TIn, MapContext, TOut>> GetProjector();

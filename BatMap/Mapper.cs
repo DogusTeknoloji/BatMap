@@ -7,10 +7,7 @@ namespace BatMap {
 
     public static class Mapper {
         private static readonly Lazy<MapConfiguration> _mapConfig = new Lazy<MapConfiguration>(() => new MapConfiguration(DynamicMapping.MapAndCache));
-
-        internal static MapConfiguration DefaultConfig {
-            get { return _mapConfig.Value; }
-        }
+        private static MapConfiguration DefaultConfig => _mapConfig.Value;
 
         #region Register
 

@@ -1,25 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace BatMap {
 
     public sealed class MapDefinition<TIn, TOut> : IMapDefinition<TIn, TOut> {
-        private static readonly MethodInfo _newInstanceMethod;
-        private static readonly MethodInfo _getFromCacheMethod;
         private readonly Lazy<Func<TIn, MapContext, TOut>> _lazyMapperWithCache;
-
-        static MapDefinition() {
-            _newInstanceMethod = typeof(MapContext).GetMethod("NewInstance");
-            _getFromCacheMethod = typeof(MapContext).GetMethod("GetFromCache");
-        }
 
         internal MapDefinition(Expression<Func<TIn, MapContext, TOut>> projector) {
             InType = typeof(TIn);
             Projector = projector;
             Mapper = Helper.CreateMapper(projector);
-            _lazyMapperWithCache = new Lazy<Func<TIn, MapContext, TOut>>(() => CompileMapperWithCache());
+            _lazyMapperWithCache = new Lazy<Func<TIn, MapContext, TOut>>(CompileMapperWithCache);
         }
 
         public Type InType { get; }
@@ -28,9 +20,7 @@ namespace BatMap {
 
         public Func<TIn, MapContext, TOut> Mapper { get; }
 
-        public Func<TIn, MapContext, TOut> MapperWithCache {
-            get { return _lazyMapperWithCache.Value; }
-        }
+        public Func<TIn, MapContext, TOut> MapperWithCache => _lazyMapperWithCache.Value;
 
         private Func<TIn, MapContext, TOut> CompileMapperWithCache() {
             var memberInit = Projector.Body as MemberInitExpression;
@@ -48,9 +38,9 @@ namespace BatMap {
             var returnExpression = Expression.Return(returnTarget, varExp, retType);
             var returnLabel = Expression.Label(returnTarget, Expression.Default(retType));
 
-            var ifExp = Expression.IfThen(Expression.Call(contextPrm, _getFromCacheMethod.MakeGenericMethod(outType), inPrm, varExp), returnExpression);
+            var ifExp = Expression.IfThen(Expression.Call(contextPrm, MapContext.GetFromCacheMethod.MakeGenericMethod(outType), inPrm, varExp), returnExpression);
             var assExp = Expression.Assign(varExp, newExp);
-            var callExp = Expression.Call(contextPrm, _newInstanceMethod, inPrm, varExp);
+            var callExp = Expression.Call(contextPrm, MapContext.NewInstanceMethod, inPrm, varExp);
             var expressions = new List<Expression> { ifExp, assExp, callExp };
 
             foreach (var binding in bindings) {
@@ -63,22 +53,16 @@ namespace BatMap {
             expressions.Add(returnExpression);
             expressions.Add(returnLabel);
 
-            var block = Expression.Block(new ParameterExpression[] { varExp }, expressions);
+            var block = Expression.Block(new[] { varExp }, expressions);
             var lambda = Expression.Lambda<Func<TIn, MapContext, TOut>>(block, inPrm, contextPrm);
             return Helper.CreateMapper(lambda);
         }
 
-        LambdaExpression IMapDefinition.Projector {
-            get { return Projector; }
-        }
+        LambdaExpression IMapDefinition.Projector => Projector;
 
-        Delegate IMapDefinition.Mapper {
-            get { return Mapper; }
-        }
+        Delegate IMapDefinition.Mapper => Mapper;
 
-        Delegate IMapDefinition.MapperWithCache {
-            get { return MapperWithCache; }
-        }
+        Delegate IMapDefinition.MapperWithCache => MapperWithCache;
     }
 
     public interface IMapDefinition<TIn, TOut> : IMapDefinition {

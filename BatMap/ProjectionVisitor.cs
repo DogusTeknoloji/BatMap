@@ -15,7 +15,7 @@ namespace BatMap {
         }
 
         internal LambdaExpression VisitProjector(LambdaExpression projector) {
-            var newBody = base.Visit(projector.Body);
+            var newBody = Visit(projector.Body);
             return Expression.Lambda(newBody, projector.Parameters[0]);
         }
 
@@ -24,7 +24,7 @@ namespace BatMap {
             var newBindings = new List<MemberBinding>();
             foreach (var binding in node.Bindings) {
                 var assignment = binding as MemberAssignment;
-                if (assignment != null && assignment.Expression is DefaultExpression) continue;
+                if (assignment?.Expression is DefaultExpression) continue;
 
                 newBindings.Add(binding);
             }
@@ -53,9 +53,9 @@ namespace BatMap {
                         { oldInPrm, inPrm }
                     };
                     var parameterReplaceVisitor = new ParameterReplaceVisitor(replaceParams);
-                    return base.Visit(parameterReplaceVisitor.Visit(memberInit));
+                    return Visit(parameterReplaceVisitor.Visit(memberInit));
                 }
-                else if (node.Method.Name == "MapToList" || node.Method.Name == "MapToArray") {
+                if (node.Method.Name == "MapToList" || node.Method.Name == "MapToArray") {
                     var retType = node.Method.ReturnType;
                     var inPrm = node.Arguments[0];
                     var genPrms = node.Method.GetGenericArguments();
@@ -71,18 +71,18 @@ namespace BatMap {
                     var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
                     var subValue = new ProjectionVisitor(_mapConfiguration, memberIncludePath?.Children).VisitProjector(mapDefinition.Projector);
                     var methodName = node.Method.Name.Substring(3);
-                    var subProjector = Expression.Call(typeof(Enumerable), "Select", new Type[] {
+                    var subProjector = Expression.Call(typeof(Enumerable), "Select", new[] {
                         node.Method.GetGenericArguments()[0],
                         node.Method.GetGenericArguments()[1]
                     }, node.Arguments[0], subValue);
-                    return Expression.Call(typeof(Enumerable), methodName, new Type[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
+                    return Expression.Call(typeof(Enumerable), methodName, new[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
                 }
 
                 throw new InvalidOperationException(
                     $"Projection does not support MapContext method '{node.Method.Name}', only 'Map', 'MapToList' and 'MapToArray' are supported."
                 );
             }
-            else if (node.Method.DeclaringType == typeof(Enumerable) && node.Method.Name == "ToList") {
+            if (node.Method.DeclaringType == typeof(Enumerable) && node.Method.Name == "ToList") {
                 var retType = node.Method.ReturnType;
 
                 var subNode = node.Arguments[0] as MethodCallExpression;
@@ -96,11 +96,11 @@ namespace BatMap {
                     }
 
                     var subValue = new ProjectionVisitor(_mapConfiguration, memberIncludePath?.Children).Visit(subNode.Arguments[1]);
-                    var subProjector = Expression.Call(typeof(Enumerable), "Select", new Type[] {
+                    var subProjector = Expression.Call(typeof(Enumerable), "Select", new[] {
                         subNode.Method.GetGenericArguments()[0],
                         subNode.Method.GetGenericArguments()[1]
                     }, subNode.Arguments[0], subValue);
-                    return Expression.Call(typeof(Enumerable), "ToList", new Type[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
+                    return Expression.Call(typeof(Enumerable), "ToList", new[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
                 }
             }
 

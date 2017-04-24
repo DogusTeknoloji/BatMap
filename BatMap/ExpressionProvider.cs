@@ -21,11 +21,7 @@ namespace BatMap {
             MapToDictionaryMethod = type.GetMethod("MapToDictionary");
         }
 
-        internal static ExpressionProvider Instance {
-            get {
-                return _lazyInstance.Value;
-            }
-        }
+        internal static ExpressionProvider Instance => _lazyInstance.Value;
 
         public virtual MemberBinding CreateMemberBinding(MapMember outMember, MapMember inMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
             if (inMember.IsPrimitive) {
@@ -87,7 +83,6 @@ namespace BatMap {
     }
 
     public interface IExpressionProvider {
-
         MemberBinding CreateMemberBinding(MapMember outMember, MapMember inMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm);
     }
 }

@@ -18,12 +18,12 @@ namespace BatMap {
             _lazyRegisterMapMethod = new Lazy<MethodInfo>(() => {
                 return typeof(MapConfiguration)
                     .GetRuntimeMethods()
-                    .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod == true && mi.GetParameters().First().HasDefaultValue);
+                    .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod && mi.GetParameters().First().HasDefaultValue);
             });
             _lazyGenerateMapDefinitionMethod = new Lazy<MethodInfo>(() => {
                 return typeof(MapConfiguration)
                     .GetRuntimeMethods()
-                    .First(mi => mi.Name == "GenerateMapDefinition" && mi.IsGenericMethod == true);
+                    .First(mi => mi.Name == "GenerateMapDefinition" && mi.IsGenericMethod);
             });
         }
 
@@ -176,7 +176,7 @@ namespace BatMap {
             return (IQueryable<TOut>)query.Provider.CreateQuery(
                 Expression.Call(
                     typeof(Queryable), "Select",
-                    new Type[] { query.ElementType, typeof(TOut) },
+                    new[] { query.ElementType, typeof(TOut) },
                     query.Expression, projector
                 )
             );

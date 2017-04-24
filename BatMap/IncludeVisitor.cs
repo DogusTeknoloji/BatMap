@@ -16,8 +16,6 @@ namespace BatMap {
 
         protected override Expression VisitMethodCall(MethodCallExpression m) {
             if (m.Method.Name == "IncludeSpan") {
-                var includes = new Dictionary<string, List<string>>();
-
                 foreach (var arg in m.Arguments) {
                     var spanList = (IEnumerable<object>)Helper.GetPrivatePropertyValue(Helper.GetPrivatePropertyValue(arg, "Value"), "SpanList");
 

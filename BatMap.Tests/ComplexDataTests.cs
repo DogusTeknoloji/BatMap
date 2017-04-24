@@ -68,8 +68,7 @@ namespace BatMap.Tests {
             var order = Builder<Order>.CreateNew().Build();
             var orderDetail = Builder<OrderDetail>.CreateNew().Build();
 
-            order.OrderDetails = new List<OrderDetail>();
-            order.OrderDetails.Add(orderDetail);
+            order.OrderDetails = new List<OrderDetail> {orderDetail};
             orderDetail.Order = order;
 
             var orderDto = config.Map<OrderDTO>(order, true);

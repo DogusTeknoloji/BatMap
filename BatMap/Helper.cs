@@ -19,17 +19,19 @@ namespace BatMap {
         public static object GetPrivatePropertyValue(object obj, string propName) {
             var propertyInfo = obj.GetType().GetTypeInfo()
                 .GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            return propertyInfo.GetValue(obj, null);
+
+            return propertyInfo?.GetValue(obj, null);
         }
 
         public static object GetPrivateFieldValue(object obj, string propName) {
             var fieldInfo = obj.GetType().GetTypeInfo()
                 .GetField(propName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            return fieldInfo.GetValue(obj);
+
+            return fieldInfo?.GetValue(obj);
         }
 
         public static IEnumerable<MapMember> GetMapFields(Type type, bool onlyWritable = false,
-                                                            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) {
+                                                          BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public) {
             IEnumerable<PropertyInfo> properties = type.GetProperties(bindingFlags);
             if (onlyWritable) {
                 properties = properties.Where(p => p.CanWrite);

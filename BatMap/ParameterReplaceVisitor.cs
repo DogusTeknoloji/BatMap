@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 namespace BatMap {
 
     internal class ParameterReplaceVisitor : ExpressionVisitor {
-        Dictionary<ParameterExpression, Expression> _pairs;
+        private readonly Dictionary<ParameterExpression, Expression> _pairs;
 
         internal ParameterReplaceVisitor(Dictionary<ParameterExpression, Expression> pairs) {
             _pairs = pairs;
@@ -12,11 +12,7 @@ namespace BatMap {
 
         protected override Expression VisitParameter(ParameterExpression node) {
             Expression newPrm;
-            if (_pairs.TryGetValue(node, out newPrm)) {
-                return Visit(newPrm);
-            }
-
-            return base.VisitParameter(node);
+            return _pairs.TryGetValue(node, out newPrm) ? Visit(newPrm) : base.VisitParameter(node);
         }
     }
 }

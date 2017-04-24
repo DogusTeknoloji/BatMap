@@ -114,9 +114,10 @@ namespace BatMap.Tests {
        
         [Test]
         public void Queryable_ProjectTo() {
-            var dtos = Customers.AsQueryable().ProjectTo<CustomerDTO>(true);
+            var addresses = Customers.First().Addresses;
+            var dtos = addresses.AsQueryable().ProjectTo<AddressDTO>(false);
 
-            Assert.AreEqual(dtos.Count(), Customers.Count);
+            Assert.AreEqual(dtos.Count(), addresses.Count);
         }
 
         [Test]

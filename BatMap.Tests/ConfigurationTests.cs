@@ -210,19 +210,11 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void Null_Map_Without_Destination_With_Null() {
-            var config = new MapConfiguration();
-            config.RegisterMap<Customer, CustomerDTO>();
-
-            Assert.IsNull(config.Map(null, true));
-        }
-
-        [Test]
         public void Map_Without_Destination_With_Null() {
             var config = new MapConfiguration();
             config.RegisterMap<Customer, CustomerDTO>();
 
-            config.Map(new Customer(), null);
+            Assert.IsNull(config.Map(null, true));
         }
 
         [Test]

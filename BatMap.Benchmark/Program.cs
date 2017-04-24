@@ -66,7 +66,7 @@ namespace BatMap.Benchmark {
         }
 
         static void Main() {
-            var summary = BenchmarkRunner.Run<Program>();
+            BenchmarkRunner.Run<Program>();
             //ManualTest();
         }
 

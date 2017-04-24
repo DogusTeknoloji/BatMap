@@ -1,11 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace BatMap {
 
     public sealed class MapContext {
+        internal static readonly MethodInfo NewInstanceMethod;
+        internal static readonly MethodInfo GetFromCacheMethod;
+
         private readonly Dictionary<int, object> _referenceCache = new Dictionary<int, object>();
         private readonly MapConfiguration _mapper;
+
+        static MapContext() {
+            NewInstanceMethod = typeof(MapContext).GetMethod("NewInstance");
+            GetFromCacheMethod = typeof(MapContext).GetMethod("GetFromCache");
+        }
 
         public MapContext(MapConfiguration mapper, bool preserveReferences) {
             _mapper = mapper;
