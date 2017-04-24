@@ -100,7 +100,7 @@ namespace BatMap.Tests {
             var order = Builder<Order>.CreateNew().Build();
             var orderDto = config.Map<OrderDTO>(order);
 
-            Assert.AreEqual(order.Price * 3, orderDto.Price);
+            Assert.IsTrue(orderDto.Price.Equals(order.Price * 3));
         }
 
         [Test]
