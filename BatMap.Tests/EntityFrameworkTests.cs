@@ -38,6 +38,25 @@ namespace BatMap.Tests {
         }
 
         [Test]
+        public void Get_Includes() {
+            var context = new TestEntities();
+            var q = context.Orders
+                .Include(o => o.OrderDetails.Select(od => od.Product.Supplier.Addresses.Select(a => a.City)))
+                .Include(o => o.OrderDetails.Select(od => od.Product.Supplier.MainAddress));
+
+            var oIncludes = Helper.GetIncludes(q).FirstOrDefault();
+            Assert.NotNull(oIncludes);
+
+            var odInclude = oIncludes.Children.FirstOrDefault();
+            Assert.NotNull(odInclude);
+
+            var pInclude = odInclude.Children.FirstOrDefault();
+            Assert.NotNull(pInclude);
+
+            Assert.AreEqual(pInclude.Children.Count(), 2);
+        }
+
+        [Test]
         public void Project_Orders() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>();
@@ -58,7 +77,7 @@ namespace BatMap.Tests {
         [Test]
         public void Project_Orders_With_Details_Product_Company() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
-            
+
             var mockContext = new Mock<TestEntities>();
             var observableOrders = new ObservableCollection<Order>(_orders);
             mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
@@ -68,7 +87,7 @@ namespace BatMap.Tests {
             var dtoList = dtoQuery.ToList();
 
             Assert.AreEqual(
-                dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName, 
+                dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
@@ -154,7 +173,7 @@ namespace BatMap.Tests {
             mockList.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
             mockList.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
             mockList.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(queryable.GetEnumerator());
-            
+
             return mockList;
         }
     }
