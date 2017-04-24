@@ -25,6 +25,7 @@ before_build:
 after_build:
 - nuget pack BatMap\BatMap.csproj -IncludeReferencedProjects -Version %appveyor_build_version%
 - appveyor PushArtifact BatMap.%appveyor_build_version%.nupkg
+- BatMap.Benchmark\bin\%CONFIGURATION%\BatMap.Benchmark.exe
 
 test_script:
 - packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:packages\NUnit.ConsoleRunner.3.6.1\tools\nunit3-console.exe -targetargs:BatMap.Tests\bin\%CONFIGURATION%\BatMap.Tests.dll -filter:"+[BatMap*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -output:opencoverCoverage.xml
