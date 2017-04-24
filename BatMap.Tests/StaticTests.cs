@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder.Spatial;
 using System.Linq;
 using System.Reflection;
 using BatMap.Tests.DTO;

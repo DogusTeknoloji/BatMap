@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.Entity;
-using FizzWare.NBuilder;
-using NUnit.Framework;
+using System.Linq;
 using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
-using System.Linq;
+using FizzWare.NBuilder;
 using Moq;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace BatMap.Tests {
 
