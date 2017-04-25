@@ -21,7 +21,7 @@ namespace BatMap.Tests {
             var products = Builder<Product>
                 .CreateListOfSize(15)
                 .All()
-                .Do(p => p.Supplier = Builder<Company>.CreateNew().Build())
+                .Do(p => p.Supplier = Builder<Company>.CreateNew().Do(s => s.Addresses = Builder<Address>.CreateListOfSize(2).Build()).Build())
                 .Build();
 
             _orders = Builder<Order>
@@ -57,7 +57,7 @@ namespace BatMap.Tests {
                 Assert.AreEqual(pInclude.Children.Count(), 2);
             }
             catch {
-                // CIs will probably fail, we can still use this test locally
+                // Most CIs will probably fail, we can still use this test locally
                 Assert.Pass();
             }
         }
@@ -118,6 +118,8 @@ namespace BatMap.Tests {
 
         [Test]
         public void Project_Orders_Custom_Expression() {
+            // we aren't registering OrderDetail-OrderDetailDTO because we declare the custom mapping
+            // even we don't include OrderDetail in the query, it will be mapped
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
                 Id = o.Id,
@@ -138,11 +140,43 @@ namespace BatMap.Tests {
             var dtoQuery = config.ProjectTo<OrderDTO>(query, new IncludePath[] { });
             var dtoList = dtoQuery.ToList();
 
-            Assert.IsNull(dtoList[3].OrderDetails);
+            Assert.IsNotNull(dtoList[3].OrderDetails);
+            Assert.AreEqual(dtoList[3].OrderDetails.Count, _orders[3].OrderDetails.Count);
+            Assert.IsTrue(dtoList.All(o => o.OrderDetails.All(od => od.Product == null)));
         }
 
         [Test]
-        public void Project_Orders_With_Details_Product_Custom_Expression() {
+        public void Project_Orders_Custom_Expression2() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
+                Id = o.Id,
+                OrderNo = o.OrderNo,
+                // ReSharper disable once ConvertClosureToMethodGroup
+                // it will fail for method group because it must be an "Expression" to be handled
+                // mc.Map will be included in the final expression because we are using "Select" for "OrderDetails" navigation
+                // using "Select" is equal of saying "always map this property my way"
+                // if we want it to be dynamically decided for plural navigations we should have used: "mc.MapToList<OrderDetail, OrderDetailDTO>"
+                OrderDetails = o.OrderDetails.Select(od => mc.Map<OrderDetail, OrderDetailDTO>(od)).ToList(),
+                Price = o.Price
+            });
+            // similar custom mapping. but this time we need to register OrderDetail-OrderDetailDTO to allow MapContext to do the mapping
+            config.RegisterMap<OrderDetail, OrderDetailDTO>();
+
+            var mockContext = new Mock<TestEntities>();
+            var observableOrders = new ObservableCollection<Order>(_orders);
+            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
+
+            var query = mockContext.Object.Orders;
+            var dtoQuery = config.ProjectTo<OrderDTO>(query, new IncludePath[] { });
+            var dtoList = dtoQuery.ToList();
+
+            Assert.IsNotNull(dtoList[3].OrderDetails);
+            Assert.AreEqual(dtoList[3].OrderDetails.Count, _orders[3].OrderDetails.Count);
+            Assert.IsTrue(dtoList.All(o => o.OrderDetails.All(od => od.Product == null)));
+        }
+
+        [Test]
+        public void Project_Orders_With_Details_Product_Supplier_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
                 Id = o.Id,
@@ -169,9 +203,11 @@ namespace BatMap.Tests {
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
+
+            Assert.IsNull(dtoList[3].OrderDetails.ToList()[2].Product.Supplier.Addresses);
         }
 
-        public static Mock<DbSet<T>> GetMockSet<T>(ObservableCollection<T> list) where T : class {
+        private static Mock<DbSet<T>> GetMockSet<T>(IEnumerable<T> list) where T : class {
             var queryable = list.AsQueryable();
             var mockList = new Mock<DbSet<T>>(MockBehavior.Loose);
 

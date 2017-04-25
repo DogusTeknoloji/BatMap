@@ -33,16 +33,24 @@ namespace BatMap {
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node) {
-            if (node.Method.DeclaringType == typeof(MapContext)) {
-                if (node.Method.Name == "Map") {
+            if (node.Method.DeclaringType == typeof(MapContext))
+                return VisitMapContextCall(node);
+
+            if (node.Method.DeclaringType == typeof(Enumerable) && node.Method.Name == "Select")
+                return VisitSelectCall(node);
+
+            return base.VisitMethodCall(node);
+        }
+
+        private Expression VisitMapContextCall(MethodCallExpression node) {
+            switch (node.Method.Name) {
+                case "Map": {
                     var inPrm = node.Arguments[0];
                     var inType = inPrm.Type;
                     var outType = node.Method.ReturnType;
 
-                    if (_includes != null) {
-                        var path = Helper.GetMemberPath(inPrm as MemberExpression);
-                        if (path.Any() && GetIncludePath(path) == null) return Expression.Default(outType);
-                    }
+                    if (_includes != null && !CheckInclude(inPrm))
+                        return Expression.Default(outType);
 
                     var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
                     var projector = mapDefinition.Projector;
@@ -53,9 +61,10 @@ namespace BatMap {
                         { oldInPrm, inPrm }
                     };
                     var parameterReplaceVisitor = new ParameterReplaceVisitor(replaceParams);
+
                     return Visit(parameterReplaceVisitor.Visit(memberInit));
                 }
-                if (node.Method.Name == "MapToList" || node.Method.Name == "MapToArray") {
+                case "MapToList": {
                     var retType = node.Method.ReturnType;
                     var inPrm = node.Arguments[0];
                     var genPrms = node.Method.GetGenericArguments();
@@ -63,10 +72,8 @@ namespace BatMap {
                     var outType = genPrms[1];
 
                     IncludePath memberIncludePath = null;
-                    if (_includes != null) {
-                        memberIncludePath = GetIncludePath(Helper.GetMemberPath(inPrm as MemberExpression));
-                        if (memberIncludePath == null) return Expression.Default(retType);
-                    }
+                    if (_includes != null && !TryGetIncludePath(inPrm, out memberIncludePath))
+                        return Expression.Default(retType);
 
                     var mapDefinition = _mapConfiguration.GetMapDefinition(inType, outType);
                     var subValue = new ProjectionVisitor(_mapConfiguration, memberIncludePath?.Children).VisitProjector(mapDefinition.Projector);
@@ -75,49 +82,52 @@ namespace BatMap {
                         node.Method.GetGenericArguments()[0],
                         node.Method.GetGenericArguments()[1]
                     }, node.Arguments[0], subValue);
+
                     return Expression.Call(typeof(Enumerable), methodName, new[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
                 }
-
-                throw new InvalidOperationException(
-                    $"Projection does not support MapContext method '{node.Method.Name}', only 'Map', 'MapToList' and 'MapToArray' are supported."
-                );
+                default:
+                    throw new InvalidOperationException(
+                        $"Projection does not support MapContext method '{node.Method.Name}', only 'Map' and 'MapToList' are supported."
+                    );
             }
-            if (node.Method.DeclaringType == typeof(Enumerable) && node.Method.Name == "ToList") {
-                var retType = node.Method.ReturnType;
-
-                var subNode = node.Arguments[0] as MethodCallExpression;
-                if (subNode != null && subNode.Method.DeclaringType == typeof(Enumerable) && subNode.Method.Name == "Select") {
-                    var inPrm = subNode.Arguments[0];
-
-                    IncludePath memberIncludePath = null;
-                    if (_includes != null) {
-                        memberIncludePath = GetIncludePath(Helper.GetMemberPath(inPrm as MemberExpression));
-                        if (memberIncludePath == null) return Expression.Default(retType);
-                    }
-
-                    var subValue = new ProjectionVisitor(_mapConfiguration, memberIncludePath?.Children).Visit(subNode.Arguments[1]);
-                    var subProjector = Expression.Call(typeof(Enumerable), "Select", new[] {
-                        subNode.Method.GetGenericArguments()[0],
-                        subNode.Method.GetGenericArguments()[1]
-                    }, subNode.Arguments[0], subValue);
-                    return Expression.Call(typeof(Enumerable), "ToList", new[] { node.Method.ReturnType.GetGenericArguments()[0] }, subProjector);
-                }
-            }
-
-            return base.VisitMethodCall(node);
         }
 
-        private IncludePath GetIncludePath(IEnumerable<string> path) {
-            IncludePath include = null;
-            var includes = _includes;
-            foreach (var member in path) {
-                include = includes.FirstOrDefault(i => i.Member == member);
-                if (include == null) return null;
+        private Expression VisitSelectCall(MethodCallExpression node) {
+            var inPrm = node.Arguments[0];
 
-                includes = include.Children;
+            IEnumerable<IncludePath> childPaths = null;
+            if (_includes != null) {
+                IncludePath subPath;
+                TryGetIncludePath(inPrm, out subPath);
+                childPaths = subPath?.Children ?? Enumerable.Empty<IncludePath>();
             }
 
-            return include;
+            var subValue = new ProjectionVisitor(_mapConfiguration, childPaths).Visit(node.Arguments[1]);
+
+            return Expression.Call(typeof(Enumerable), "Select", new[] {
+                node.Method.GetGenericArguments()[0],
+                node.Method.GetGenericArguments()[1]
+            }, node.Arguments[0], subValue);
+        }
+
+        private bool CheckInclude(Expression member) {
+            IncludePath includePath;
+            return TryGetIncludePath(member, out includePath);
+        }
+
+        private bool TryGetIncludePath(Expression memberExp, out IncludePath includePath) {
+            includePath = null;
+
+            var path = Helper.GetMemberPath(memberExp);
+            var includes = _includes;
+            foreach (var member in path) {
+                includePath = includes.FirstOrDefault(i => i.Member == member);
+                if (includePath == null) return false;
+
+                includes = includePath.Children;
+            }
+
+            return true;
         }
     }
 }
