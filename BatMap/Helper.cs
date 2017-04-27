@@ -89,7 +89,7 @@ namespace BatMap {
         }
 
         public static int GenerateHashCode(object o1, object o2, object o3) {
-            return GenerateHashCode(GenerateHashCode(o1, o1), o3);
+            return GenerateHashCode(GenerateHashCode(o1, o2), o3);
         }
 
         public static Func<TIn, MapContext, TOut> CreateMapper<TIn, TOut>(Expression<Func<TIn, MapContext, TOut>> expression) {
