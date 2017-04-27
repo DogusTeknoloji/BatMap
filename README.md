@@ -25,7 +25,7 @@ Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkD
 | ExpressMapper | 5.0814 ms |
 |    FastMapper | 5.9380 ms |
 
-<sup>Results may (probably) vary</sup>
+<sup>Results may (probably) vary. Latest run can bee seen on [Appveyor Build](https://ci.appveyor.com/project/DogusTeknoloji/batmap).</sup>
     
 * Fast (enough)
 * NOT over-engineered, code is really simple
