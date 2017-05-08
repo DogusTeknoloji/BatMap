@@ -92,6 +92,11 @@ namespace BatMap {
             return GenerateHashCode(GenerateHashCode(o1, o2), o3);
         }
 
+        public static Func<TIn, TOut, MapContext, TOut> CreatePopulator<TIn, TOut>(Expression<Func<TIn, TOut, MapContext, TOut>> expression) {
+            return (Func<TIn, TOut, MapContext, TOut>)CreateDynamicDelegate(expression, typeof(Func<TIn, TOut, MapContext, TOut>));
+        }
+
+
         public static Func<TIn, MapContext, TOut> CreateMapper<TIn, TOut>(Expression<Func<TIn, MapContext, TOut>> expression) {
             return (Func<TIn, MapContext, TOut>)CreateDynamicDelegate(expression, typeof(Func<TIn, MapContext, TOut>));
         }

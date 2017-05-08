@@ -53,13 +53,6 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void Register_With_Non_MemberInitExpression() {
-            var config = new MapConfiguration();
-            config.RegisterMap<Customer, CustomerDTO>((c, mc) => null);
-            Assert.IsNull(config.Map<CustomerDTO>(new Customer(), true));
-        }
-
-        [Test]
         public void Register_Single_To_Many_Throws_Exception() {
             Assert.Throws<ArrayTypeMismatchException>(() => new MapConfiguration().RegisterMap<ForTest1, ForTest1DTO>());
         }
@@ -77,6 +70,20 @@ namespace BatMap.Tests {
             var dto = config.Map<ForTest2DTO>(new ForTest2 { Number = 5 });
 
             Assert.AreEqual(dto.Number, 5);
+        }
+
+        [Test]
+        public void Map_With_Non_MemberInitExpression() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Customer, CustomerDTO>((c, mc) => null);
+            Assert.IsNull(config.Map<CustomerDTO>(new Customer(), true));
+        }
+
+        [Test]
+        public void Map_Existing_With_Non_MemberInitExpression() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Customer, CustomerDTO>((c, mc) => mc.Map<Customer, CustomerDTO>(c));
+            Assert.Throws<InvalidOperationException>(() => config.MapTo(new Customer(), new CustomerDTO()));
         }
 
         [Test]

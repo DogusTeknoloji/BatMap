@@ -31,6 +31,10 @@ namespace BatMap {
             return DefaultConfig.Map<TIn, TOut>(inObj, preserveReferences);
         }
 
+        public static TOut MapTo<TIn, TOut>(TIn inObj, TOut outObj, bool? preserveReferences = null) {
+            return DefaultConfig.MapTo(inObj, outObj, preserveReferences);
+        }
+
         public static TOut Map<TOut>(object inObj, bool? preserveReferences = null) {
             return DefaultConfig.Map<TOut>(inObj, preserveReferences);
         }

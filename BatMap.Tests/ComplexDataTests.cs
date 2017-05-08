@@ -68,7 +68,7 @@ namespace BatMap.Tests {
             var order = Builder<Order>.CreateNew().Build();
             var orderDetail = Builder<OrderDetail>.CreateNew().Build();
 
-            order.OrderDetails = new List<OrderDetail> {orderDetail};
+            order.OrderDetails = new List<OrderDetail> { orderDetail };
             orderDetail.Order = order;
 
             var orderDto = config.Map<OrderDTO>(order, true);
@@ -129,6 +129,22 @@ namespace BatMap.Tests {
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
+        }
+
+        [Test]
+        public void Map_Order_To_Existing() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Order, OrderDTO>();
+            config.RegisterMap<OrderDetail, OrderDetailDTO>();
+            config.RegisterMap<Product, ProductDTO>();
+            config.RegisterMap<Company, CompanyDTO>();
+
+            var entity = _orders.First();
+            var dto = new OrderDTO();
+            var mapDto = config.MapTo(entity, dto);
+
+            Assert.AreSame(dto, mapDto);
+            Assert.AreEqual(dto.OrderDetails.Count, entity.OrderDetails.Count);
         }
 
         [Test]

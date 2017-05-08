@@ -56,25 +56,35 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void RegisterWithType() {
+        public void Register_With_Type() {
             Mapper.RegisterMap(typeof(City), typeof(CityDTO));
         }
 
         [Test]
-        public void RegisterWithExpression() {
+        public void Register_With_Expression() {
             Mapper.RegisterMap<City, CityDTO>((c, mc) => new CityDTO { Id = c.Id, Name = c.Name, Population = c.Population });
         }
 
         [Test]
-        public void MapTwoGeneric() {
+        public void Map_Two_Generic() {
             var entity = Customers[0];
-            var dto = Mapper.Map<Customer, CustomerDTO>(entity);
+            var dto = Mapper.Map<Customer, CustomerDTO>(entity, false);
 
             Assert.AreEqual(entity.Id, dto.Id);
         }
 
         [Test]
-        public void MapGeneric() {
+        public void Map_To_Existing() {
+            var entity = Customers[0];
+            var dto = new CustomerDTO();
+            var mapDto = Mapper.MapTo(entity, dto, true);
+
+            Assert.AreSame(dto, mapDto);
+            Assert.AreEqual(entity.Id, dto.Id);
+        }
+
+        [Test]
+        public void Map_Generic() {
             var entity = Customers[0];
             var dto = Mapper.Map<CustomerDTO>(entity, true);
 
@@ -82,7 +92,7 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void MapWithoutDestination() {
+        public void Map_Without_Destination() {
             var entity = Customers[0];
             var dto = Mapper.Map(entity);
 
@@ -90,7 +100,7 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void MapWithDestination() {
+        public void Map_With_Destination() {
             var entity = Customers[0];
             var dto = Mapper.Map(entity, typeof(CustomerDTO));
 
@@ -98,14 +108,14 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void MapEnumerable() {
+        public void Map_Enumerable() {
             var dtos = Customers.Map<Customer, CustomerDTO>();
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
 
         [Test]
-        public void MapDictionary() {
+        public void Map_Dictionary() {
             var dict = Customers.ToDictionary(c => c.Id, c => c);
             var dtoDict = Mapper.Map<int, Customer, int, CustomerDTO>(dict);
 
@@ -121,14 +131,14 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void Queryable_ProjectToWithExpression() {
+        public void Queryable_ProjectTo_With_Expression() {
             var dtos = Customers.AsQueryable().ProjectTo<Customer, CustomerDTO>(c => c.Addresses.Select(a => a.City));
 
             Assert.AreEqual(dtos.Count(), Customers.Count);
         }
 
         [Test]
-        public void Queryable_ProjectToWithInclude() {
+        public void Queryable_ProjectTo_With_Include() {
             var dtos = Customers.AsQueryable().ProjectTo<CustomerDTO>(new IncludePath("Addresses"));
 
             Assert.AreEqual(dtos.Count(), Customers.Count);

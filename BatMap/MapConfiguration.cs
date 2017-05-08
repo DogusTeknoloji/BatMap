@@ -106,6 +106,11 @@ namespace BatMap {
             return mapper(inObj, mapContext);
         }
 
+        public TOut MapTo<TIn, TOut>(TIn inObj, TOut outObj, bool? preserveReferences = null) {
+            var mapDefinition = GetMapDefinition<TIn, TOut>();
+            return mapDefinition.Populator(inObj, outObj, new MapContext(this, preserveReferences ?? _preserveReferences));
+        }
+
         public TOut Map<TOut>(object inObj, bool? preserveReferences = null) {
             if (inObj == null) return default(TOut);
 
