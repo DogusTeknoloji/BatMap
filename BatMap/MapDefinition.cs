@@ -30,34 +30,26 @@ namespace BatMap {
             var memberInit = Projector.Body as MemberInitExpression;
             if (memberInit == null) return Mapper;
 
-            var outType = typeof(TOut);
             var inPrm = Projector.Parameters[0];
             var contextPrm = Projector.Parameters[1];
             var newExp = memberInit.NewExpression;
-            var bindings = memberInit.Bindings;
-            var varExp = Expression.Variable(newExp.Type);
-
             var retType = newExp.Type;
+            var varExp = Expression.Variable(retType);
+
             var returnTarget = Expression.Label(retType);
             var returnExpression = Expression.Return(returnTarget, varExp, retType);
             var returnLabel = Expression.Label(returnTarget, Expression.Default(retType));
 
-            var ifExp = Expression.IfThen(Expression.Call(contextPrm, MapContext.GetFromCacheMethod.MakeGenericMethod(outType), inPrm, varExp), returnExpression);
+            var ifExp = Expression.IfThen(Expression.Call(contextPrm, MapContext.GetFromCacheMethod.MakeGenericMethod(typeof(TOut)), inPrm, varExp), returnExpression);
             var assExp = Expression.Assign(varExp, newExp);
             var callExp = Expression.Call(contextPrm, MapContext.NewInstanceMethod, inPrm, varExp);
 
             var expressions = new List<Expression> { ifExp, assExp, callExp };
-            foreach (var binding in bindings) {
-                var ass = (MemberAssignment)binding;
-                var member = Expression.MakeMemberAccess(varExp, binding.Member);
-                expressions.Add(Expression.Assign(member, ass.Expression));
-            }
-            expressions.Add(returnExpression);
+            expressions.AddRange(CreateAssignments(memberInit.Bindings, varExp));
             expressions.Add(returnExpression);
             expressions.Add(returnLabel);
 
-            var block = Expression.Block(new[] { varExp }, expressions);
-            var lambda = Expression.Lambda<Func<TIn, MapContext, TOut>>(block, inPrm, contextPrm);
+            var lambda = Expression.Lambda<Func<TIn, MapContext, TOut>>(Expression.Block(new[] { varExp }, expressions), inPrm, contextPrm);
             return Helper.CreateMapper(lambda);
         }
 
@@ -68,31 +60,30 @@ namespace BatMap {
                     $"{Projector.Body?.NodeType} expression is not supported for population, please use MemberInit while registering with custom expression."
                 );
 
-            var outType = typeof(TOut);
-            var inPrm = Projector.Parameters[0];
-            var contextPrm = Projector.Parameters[1];
             var newExp = memberInit.NewExpression;
-            var bindings = memberInit.Bindings;
-            var outPrm = Expression.Parameter(newExp.Type);
-
             var retType = newExp.Type;
-            var returnTarget = Expression.Label(retType);
-            var returnExpression = Expression.Return(returnTarget, outPrm, retType);
-            var returnLabel = Expression.Label(returnTarget, Expression.Default(retType));
+            var outPrm = Expression.Parameter(retType);
 
             var expressions = new List<Expression>();
+            expressions.AddRange(CreateAssignments(memberInit.Bindings, outPrm));
+
+            var returnTarget = Expression.Label(retType);
+            expressions.Add(Expression.Return(returnTarget, outPrm, retType));
+            expressions.Add(Expression.Label(returnTarget, Expression.Default(retType)));
+
+            var lambda = Expression.Lambda<Func<TIn, TOut, MapContext, TOut>>(Expression.Block(expressions), Projector.Parameters[0], outPrm, Projector.Parameters[1]);
+            return Helper.CreatePopulator(lambda);
+        }
+
+        private IEnumerable<BinaryExpression> CreateAssignments(IReadOnlyCollection<MemberBinding> bindings, Expression target) {
+            var retVal = new List<BinaryExpression>();
             foreach (var binding in bindings) {
                 var ass = (MemberAssignment)binding;
-                var member = Expression.MakeMemberAccess(outPrm, binding.Member);
-                expressions.Add(Expression.Assign(member, ass.Expression));
+                var member = Expression.MakeMemberAccess(target, binding.Member);
+                retVal.Add(Expression.Assign(member, ass.Expression));
             }
-            expressions.Add(returnExpression);
-            expressions.Add(returnExpression);
-            expressions.Add(returnLabel);
 
-            var block = Expression.Block(expressions);
-            var lambda = Expression.Lambda<Func<TIn, TOut, MapContext, TOut>>(block, inPrm, outPrm, contextPrm);
-            return Helper.CreatePopulator(lambda);
+            return retVal;
         }
 
         LambdaExpression IMapDefinition.Projector => Projector;
