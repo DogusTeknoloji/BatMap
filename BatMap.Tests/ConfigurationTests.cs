@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
@@ -129,7 +130,7 @@ namespace BatMap.Tests {
         }
 
         [Test]
-        public void Register_With_Dictionary() {
+        public void Map_Dictionary_Property() {
             var config = new MapConfiguration();
             config.RegisterMap<ForTest4, ForTest4DTO>();
             config.RegisterMap<Order, OrderDTO>();
@@ -143,6 +144,26 @@ namespace BatMap.Tests {
             var dto = config.Map<ForTest4DTO>(entity);
 
             Assert.AreEqual(dto.Orders[2].Id, 2);
+        }
+
+        [Test]
+        public void Map_Collection_Property() {
+            var entities = Builder<ForTest5>
+                .CreateListOfSize(5)
+                .All()
+                .Do(c => {
+                    c.Cities = new Collection<City>(Builder<City>.CreateListOfSize(10).Build());
+                })
+                .Build();
+            entities[4].Cities = null;
+
+            var config = new MapConfiguration();
+            config.RegisterMap<ForTest5, ForTest5DTO>();
+            config.RegisterMap<City, CityDTO>();
+            var dtos = config.Map<ForTest5, ForTest5DTO>(entities).ToList();
+
+            Assert.True(dtos[3].Cities[2].Name == entities[3].Cities[2].Name);
+            Assert.IsNull(dtos[4].Cities);
         }
 
         [Test]

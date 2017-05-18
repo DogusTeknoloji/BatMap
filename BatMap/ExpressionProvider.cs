@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,6 +11,7 @@ namespace BatMap {
         private static readonly Lazy<ExpressionProvider> _lazyInstance = new Lazy<ExpressionProvider>();
         protected static readonly MethodInfo MapMethod;
         protected static readonly MethodInfo MapToListMethod;
+        protected static readonly MethodInfo MapToCollectionMethod;
         protected static readonly MethodInfo MapToArrayMethod;
         protected static readonly MethodInfo MapToDictionaryMethod;
 
@@ -17,6 +19,7 @@ namespace BatMap {
             var type = typeof(MapContext);
             MapMethod = type.GetMethod("Map");
             MapToListMethod = type.GetMethod("MapToList");
+            MapToCollectionMethod = type.GetMethod("MapToCollection");
             MapToArrayMethod = type.GetMethod("MapToArray");
             MapToDictionaryMethod = type.GetMethod("MapToDictionary");
         }
@@ -31,9 +34,6 @@ namespace BatMap {
 
                 return Expression.Bind(outMember.MemberInfo, member);
             }
-
-            var inMemberType = inMember.Type;
-            var outMemberType = outMember.Type;
 
             var inEnumerableType = inMember.Type.GetInterfaces()
                 .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
@@ -51,19 +51,27 @@ namespace BatMap {
                     outMember.MemberInfo, 
                     Expression.Call(
                         mapContextPrm, 
-                        MapMethod.MakeGenericMethod(inMemberType, outMemberType), 
+                        MapMethod.MakeGenericMethod(inMember.Type, outMember.Type), 
                         Expression.PropertyOrField(inObjPrm, inMember.Name)
                     )
                 );
             }
 
+            return CreateEnumerableBinding(inMember, outMember, inEnumerableType, outEnumerableType, inObjPrm, mapContextPrm);
+        }
+
+        protected virtual MemberBinding CreateEnumerableBinding(MapMember inMember, MapMember outMember, Type inEnumerableType, Type outEnumerableType,
+                                                                ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
             var outEnumType = outEnumerableType.GetGenericArguments()[0];
             MethodInfo mapMethod;
-            if (outMember.Type.IsArray) {
+            if (outMember.Type.IsGenericType && outMember.Type.GetGenericTypeDefinition() == typeof(Collection<>)) {
+                mapMethod = MapToCollectionMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outEnumType);
+            }
+            else if (outMember.Type.IsArray) {
                 mapMethod = MapToArrayMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outEnumType);
             }
             else if (outEnumType.IsGenericType && outEnumType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) {
-                var inGens = inMemberType.GetGenericArguments();
+                var inGens = inMember.Type.GetGenericArguments();
                 var outGens = outMember.Type.GetGenericArguments();
                 mapMethod = MapToDictionaryMethod.MakeGenericMethod(inGens[0], inGens[1], outGens[0], outGens[1]);
             }
@@ -72,10 +80,10 @@ namespace BatMap {
             }
 
             return Expression.Bind(
-                outMember.MemberInfo, 
+                outMember.MemberInfo,
                 Expression.Call(
-                    mapContextPrm, 
-                    mapMethod, 
+                    mapContextPrm,
+                    mapMethod,
                     Expression.PropertyOrField(inObjPrm, inMember.Name)
                 )
             );

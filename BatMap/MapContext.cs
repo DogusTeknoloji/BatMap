@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 
 namespace BatMap {
@@ -74,6 +75,12 @@ namespace BatMap {
             }
 
             return retVal;
+        }
+
+        public Collection<TOut> MapToCollection<TIn, TOut>(IEnumerable<TIn> source) {
+            if (source == null) return null;
+
+            return new Collection<TOut>(MapToList<TIn, TOut>(source));
         }
 
         public TOut[] MapToArray<TIn, TOut>(IEnumerable<TIn> source) {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BatMap.Tests.DTO {
@@ -18,5 +19,9 @@ namespace BatMap.Tests.DTO {
 
     public class ForTest4DTO {
         public Dictionary<int, OrderDTO> Orders { get; set; }
+    }
+
+    public class ForTest5DTO {
+        public Collection<CityDTO> Cities { get; set; }
     }
 }
