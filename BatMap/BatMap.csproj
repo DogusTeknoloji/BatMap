@@ -2,30 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;net40;net45</TargetFrameworks>
-    <Version>0.2</Version>
-    <Authors>Umut Özel</Authors>
-    <Company>Doğuş Teknoloji</Company>
-    <Description>BatMap - The Mapper we deserve, not the one we need. Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.</Description>
-    <Copyright>Umut Özel - Doğuş Teknoloji 2017</Copyright>
-    <PackageLicenseUrl>https://github.com/DogusTeknoloji/BatMap/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/DogusTeknoloji/BatMap</PackageProjectUrl>
-    <PackageIconUrl>https://image.ibb.co/itRs6Q/logo.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/DogusTeknoloji/BatMap</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>Mapper Projector Mapping Entity DTO</PackageTags>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
-    <FileVersion>0.2.0.0</FileVersion>
-    <NeutralLanguage>en-US</NeutralLanguage>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
-    <Folder Include="Properties\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
