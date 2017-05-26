@@ -1,10 +1,6 @@
 version: 0.2.{build}
 
-only_commits:
-  files:
-    - BatMap/
-    - BatMap.Benchmark/
-    - BatMap.Tests/
+image: Visual Studio 2017
 
 configuration: Release
 
