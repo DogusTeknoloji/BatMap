@@ -23,7 +23,7 @@ before_build:
   - nuget restore
 
 build_script:
-- dotnet build -c %CONFIGURATION% --version-suffix %LABEL%
+- dotnet build -c %CONFIGURATION% %LABEL%
 
 after_build:
 - nuget pack BatMap\BatMap.csproj -IncludeReferencedProjects -Version %appveyor_build_version%
