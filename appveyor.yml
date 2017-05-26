@@ -16,7 +16,7 @@ build:
   verbosity: minimal
   
 before_build:
-  - dotnet restore
+  - nuget restore
 
 after_build:
 - dotnet pack BatMap\BatMap.csproj /p:Version=%appveyor_build_version%
