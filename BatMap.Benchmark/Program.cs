@@ -75,8 +75,8 @@ namespace BatMap.Benchmark {
         /// </summary>
         public static void ManualTest() {
             var p = new Program();
-            p.HandWritten();
             p.BatMap();
+            p.HandWritten();
             p.AutoMapper();
             p.ExpressMapper();
             p.FastMapper();
@@ -88,16 +88,6 @@ namespace BatMap.Benchmark {
         [Benchmark]
         public void BatMap() {
             var customerDTOs = _customers.Map<Customer, CustomerDTO>().ToList();
-        }
-
-        [Benchmark]
-        public void Mapster() {
-            var customerDTOs = global::Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
-        }
-
-        [Benchmark]
-        public void SafeMapper() {
-            var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
@@ -127,6 +117,16 @@ namespace BatMap.Benchmark {
                 }).ToList(),
                 Phone = c.Phone
             }).ToList();
+        }
+
+        [Benchmark]
+        public void Mapster() {
+            var customerDTOs = global::Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
+        }
+
+        [Benchmark]
+        public void SafeMapper() {
+            var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
         }
 
         [Benchmark]
