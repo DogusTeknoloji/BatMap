@@ -5,6 +5,7 @@ before_install:
   - wget -O .nuget/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
   - mono .nuget/nuget.exe # Output NuGet's version number
 install:
+  - dotnet restore
   - mono .nuget/nuget.exe restore BatMap.sln -Verbosity detailed
 script:
   - xbuild /p:Configuration=Release BatMap.sln
