@@ -75,7 +75,7 @@ namespace BatMap {
             return Helper.CreatePopulator(lambda);
         }
 
-        private IEnumerable<BinaryExpression> CreateAssignments(IReadOnlyCollection<MemberBinding> bindings, Expression target) {
+        private IEnumerable<BinaryExpression> CreateAssignments(IEnumerable<MemberBinding> bindings, Expression target) {
             var retVal = new List<BinaryExpression>();
             foreach (var binding in bindings) {
                 var ass = (MemberAssignment)binding;

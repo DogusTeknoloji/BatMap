@@ -7,24 +7,30 @@ using System.Reflection;
 namespace BatMap {
 
     public class MapConfiguration {
-        private static readonly Lazy<MethodInfo> _lazyRegisterMapMethod;
-        private static readonly Lazy<MethodInfo> _lazyGenerateMapDefinitionMethod;
+        private static readonly MethodInfo _registerMapMethod;
+        private static readonly MethodInfo _generateMapDefinitionMethod;
         private readonly Dictionary<int, IMapDefinition> _mapDefinitions = new Dictionary<int, IMapDefinition>();
         private readonly IExpressionProvider _expressionProvider;
         private readonly DynamicMapping _dynamicMapping;
         private readonly bool _preserveReferences;
 
         static MapConfiguration() {
-            _lazyRegisterMapMethod = new Lazy<MethodInfo>(() => {
-                return typeof(MapConfiguration)
-                    .GetRuntimeMethods()
+#if NET_STANDARD
+            var methods = typeof(MapConfiguration).GetRuntimeMethods();
+#else
+            var methods = typeof(MapConfiguration).GetMethods();
+#endif
+
+#if NO_HasDefaultValue
+            _registerMapMethod = methods
+                .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod
+                            && mi.GetParameters().First().ParameterType.GetGenericTypeDefinition() == typeof(Action<>));
+#else
+            _registerMapMethod = methods
                     .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod && mi.GetParameters().First().HasDefaultValue);
-            });
-            _lazyGenerateMapDefinitionMethod = new Lazy<MethodInfo>(() => {
-                return typeof(MapConfiguration)
-                    .GetRuntimeMethods()
+#endif
+            _generateMapDefinitionMethod = methods
                     .First(mi => mi.Name == "GenerateMapDefinition" && mi.IsGenericMethod);
-            });
         }
 
         public MapConfiguration(DynamicMapping dynamicMapping = DynamicMapping.NotAllowed, 
@@ -40,10 +46,10 @@ namespace BatMap {
             _preserveReferences = preserveReferences;
         }
 
-        #region Register
+#region Register
 
         public IMapDefinition RegisterMap(Type inType, Type outType) {
-            return (IMapDefinition)_lazyRegisterMapMethod.Value.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
+            return (IMapDefinition)_registerMapMethod.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
         }
 
         public IMapDefinition<TIn, TOut> RegisterMap<TIn, TOut>(Action<MapBuilder<TIn, TOut>> buildAction = null) {
@@ -81,7 +87,7 @@ namespace BatMap {
         }
 
         private IMapDefinition GenerateMapDefinition(Type inType, Type outType) {
-            return (IMapDefinition)_lazyGenerateMapDefinitionMethod.Value.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
+            return (IMapDefinition)_generateMapDefinitionMethod.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
         }
 
         public IMapDefinition<TIn, TOut> GenerateMapDefinition<TIn, TOut>(Action<MapBuilder<TIn, TOut>> buildAction = null) {
@@ -90,9 +96,9 @@ namespace BatMap {
             return new MapDefinition<TIn, TOut>(builder.GetProjector());
         }
 
-        #endregion
+#endregion
 
-        #region Map
+#region Map
 
         public TOut Map<TIn, TOut>(TIn inObj, bool? preserveReferences = null) {
             if (Equals(inObj, default(TIn))) return default(TOut);
@@ -157,9 +163,9 @@ namespace BatMap {
             return mapContext.MapToDictionary<TInKey, TInValue, TOutKey, TOutValue>(source);
         }
 
-        #endregion
+#endregion
 
-        #region Projection
+#region Projection
         
         public IQueryable<TOut> ProjectTo<TOut>(IQueryable query, bool checkIncludes = true) {
             return ProjectToImpl<TOut>(query, checkIncludes ? new IncludeVisitor().GetIncludes(query) : null);
@@ -209,6 +215,6 @@ namespace BatMap {
             return projectionVisitor.VisitProjector(mapDefinition.Projector);
         }
 
-        #endregion
+#endregion
     }
 }

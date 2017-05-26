@@ -10,8 +10,7 @@ namespace BatMap {
             Type = type;
             MemberInfo = memberInfo;
 
-            IsPrimitive = Type.GetTypeCode(type) != TypeCode.Object // only primitive properties
-                || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)); // including nullable ones
+            IsPrimitive = Helper.IsPrimitive(type);
         }
 
         public string Name { get; }

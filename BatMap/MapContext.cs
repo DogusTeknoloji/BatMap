@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+#if NET_STANDARD
+using System.Linq;
+#endif
 using System.Reflection;
 
 namespace BatMap {
@@ -13,8 +16,15 @@ namespace BatMap {
         private readonly MapConfiguration _mapper;
 
         static MapContext() {
-            NewInstanceMethod = typeof(MapContext).GetMethod("NewInstance");
-            GetFromCacheMethod = typeof(MapContext).GetMethod("GetFromCache");
+            var type = typeof(MapContext);
+#if NET_STANDARD
+            var methods = type.GetRuntimeMethods().ToList();
+            NewInstanceMethod = methods.First(m => m.Name == "NewInstance");
+            GetFromCacheMethod = methods.First(m => m.Name == "GetFromCache");
+#else
+            NewInstanceMethod = type.GetMethod("NewInstance");
+            GetFromCacheMethod = type.GetMethod("GetFromCache");
+#endif
         }
 
         public MapContext(MapConfiguration mapper, bool preserveReferences) {
