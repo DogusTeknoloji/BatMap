@@ -19,7 +19,7 @@ before_build:
   - nuget restore
 
 after_build:
-- dotnet pack BatMap\BatMap.csproj /p:Version=%appveyor_build_version%
+- dotnet pack BatMap\BatMap.csproj -c Release /p:Version=%appveyor_build_version%
 - appveyor PushArtifact BatMap\bin\%CONFIGURATION%\BatMap.%appveyor_build_version%.nupkg
 - BatMap.Benchmark\bin\%CONFIGURATION%\BatMap.Benchmark.exe
 
