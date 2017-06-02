@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,9 +10,9 @@ namespace BatMap {
         private static readonly Lazy<ExpressionProvider> _lazyInstance = new Lazy<ExpressionProvider>();
         protected static readonly MethodInfo MapMethod;
         protected static readonly MethodInfo MapToListMethod;
-        protected static readonly MethodInfo MapToCollectionMethod;
         protected static readonly MethodInfo MapToArrayMethod;
         protected static readonly MethodInfo MapToDictionaryMethod;
+        protected static readonly MethodInfo MapToCollectionTypeMethod;
 
         static ExpressionProvider() {
 #if NET_STANDARD
@@ -24,9 +23,9 @@ namespace BatMap {
 
             MapMethod = methods.First(m => m.Name == "Map");
             MapToListMethod = methods.First(m => m.Name == "MapToList");
-            MapToCollectionMethod = methods.First(m => m.Name == "MapToCollection");
             MapToArrayMethod = methods.First(m => m.Name == "MapToArray");
             MapToDictionaryMethod = methods.First(m => m.Name == "MapToDictionary");
+            MapToCollectionTypeMethod = methods.First(m => m.Name == "MapToCollectionType");
         }
 
         internal static ExpressionProvider Instance => _lazyInstance.Value;
@@ -77,36 +76,38 @@ namespace BatMap {
                                                                 ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
             MethodInfo mapMethod;
 #if NET_STANDARD
-            var outEnumType = outEnumerableType.GenericTypeArguments[0];
-            if (outMember.Type.GetTypeInfo().IsGenericType && outMember.Type.GetGenericTypeDefinition() == typeof(Collection<>)) {
-                mapMethod = MapToCollectionMethod.MakeGenericMethod(inEnumerableType.GenericTypeArguments[0], outEnumType);
+            var outGenericType = outEnumerableType.GenericTypeArguments[0];
+            var outList = typeof(List<>).MakeGenericType(outGenericType);
+            if (outMember.Type.GetTypeInfo().IsAssignableFrom(outList.GetTypeInfo())) {
+                mapMethod = MapToListMethod.MakeGenericMethod(inEnumerableType.GenericTypeArguments[0], outGenericType);
             }
             else if (outMember.Type.IsArray) {
-                mapMethod = MapToArrayMethod.MakeGenericMethod(inEnumerableType.GenericTypeArguments[0], outEnumType);
+                mapMethod = MapToArrayMethod.MakeGenericMethod(inEnumerableType.GenericTypeArguments[0], outGenericType);
             }
-            else if (outEnumType.GetTypeInfo().IsGenericType && outEnumType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) {
+            else if (outGenericType.GetTypeInfo().IsGenericType && outGenericType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) {
                 var inGens = inMember.Type.GenericTypeArguments;
                 var outGens = outMember.Type.GenericTypeArguments;
                 mapMethod = MapToDictionaryMethod.MakeGenericMethod(inGens[0], inGens[1], outGens[0], outGens[1]);
             }
             else {
-                mapMethod = MapToListMethod.MakeGenericMethod(inEnumerableType.GenericTypeArguments[0], outEnumType);
+                mapMethod = MapToCollectionTypeMethod.MakeGenericMethod(inEnumerableType.GenericTypeArguments[0], outGenericType, outMember.Type);
             }
 #else
-            var outEnumType = outEnumerableType.GetGenericArguments()[0];
-            if (outMember.Type.IsGenericType && outMember.Type.GetGenericTypeDefinition() == typeof(Collection<>)) {
-                mapMethod = MapToCollectionMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outEnumType);
+            var outGenericType = outEnumerableType.GetGenericArguments()[0];
+            var outList = typeof(List<>).MakeGenericType(outGenericType);
+            if (outMember.Type.IsAssignableFrom(outList)) {
+                mapMethod = MapToListMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outGenericType);
             }
             else if (outMember.Type.IsArray) {
-                mapMethod = MapToArrayMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outEnumType);
+                mapMethod = MapToArrayMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outGenericType);
             }
-            else if (outEnumType.IsGenericType && outEnumType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) {
+            else if (outGenericType.IsGenericType && outGenericType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)) {
                 var inGens = inMember.Type.GetGenericArguments();
                 var outGens = outMember.Type.GetGenericArguments();
                 mapMethod = MapToDictionaryMethod.MakeGenericMethod(inGens[0], inGens[1], outGens[0], outGens[1]);
             }
             else {
-                mapMethod = MapToListMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outEnumType);
+                mapMethod = MapToCollectionTypeMethod.MakeGenericMethod(inEnumerableType.GetGenericArguments()[0], outGenericType, outMember.Type);
             }
 #endif
 

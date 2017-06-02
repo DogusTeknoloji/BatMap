@@ -167,6 +167,26 @@ namespace BatMap.Tests {
         }
 
         [Test]
+        public void Map_HashSet_Property() {
+            var entities = Builder<ForTest6>
+                .CreateListOfSize(5)
+                .All()
+                .Do(c => {
+                    c.Cities = new HashSet<City>(Builder<City>.CreateListOfSize(10).Build());
+                })
+                .Build();
+            entities[4].Cities = null;
+
+            var config = new MapConfiguration();
+            config.RegisterMap<ForTest6, ForTest6DTO>();
+            config.RegisterMap<City, CityDTO>();
+            var dtos = config.Map<ForTest6, ForTest6DTO>(entities).ToList();
+
+            Assert.True(dtos[3].Cities.First().Name == entities[3].Cities.First().Name);
+            Assert.IsNull(dtos[4].Cities);
+        }
+
+        [Test]
         public void Map_Null_Dictionary_Returns_Null() {
             var config = new MapConfiguration();
 

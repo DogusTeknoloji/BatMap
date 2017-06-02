@@ -24,4 +24,8 @@ namespace BatMap.Tests.Model {
     public class ForTest5 {
         public Collection<City> Cities { get; set; }
     }
+
+    public class ForTest6 {
+        public HashSet<City> Cities { get; set; }
+    }
 }

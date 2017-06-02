@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-#if NET_STANDARD
 using System.Linq;
-#endif
 using System.Reflection;
 
 namespace BatMap {
@@ -97,6 +95,30 @@ namespace BatMap {
             if (source == null) return null;
 
             return MapToList<TIn, TOut>(source).ToArray();
+        }
+
+        public TOutCollection MapToCollectionType<TIn, TOut, TOutCollection>(IEnumerable<TIn> source) {
+            if (source == null) return default(TOutCollection);
+
+            var outList = typeof(List<>).MakeGenericType(typeof(TOut));
+            var outCollectionType = typeof(TOutCollection);
+            var ctor = outCollectionType
+#if NET_STANDARD
+                .GetTypeInfo().DeclaredConstructors
+#else
+                .GetConstructors()
+#endif
+                .Where(c => c.GetParameters().Length == 1)
+#if NET_STANDARD
+                .FirstOrDefault(c => c.GetParameters().First().ParameterType.GetTypeInfo().IsAssignableFrom(outList.GetTypeInfo()));
+#else
+                .FirstOrDefault(c => c.GetParameters().First().ParameterType.IsAssignableFrom(outList));
+#endif
+
+            if (ctor != null)
+                return (TOutCollection) ctor.Invoke(new object[] { MapToList<TIn, TOut>(source) });
+
+            throw new NotSupportedException($"{outCollectionType} target type is not supported.");
         }
 
         public Dictionary<TOutKey, TOutValue> MapToDictionary<TInKey, TInValue, TOutKey, TOutValue>(IDictionary<TInKey, TInValue> source) {
