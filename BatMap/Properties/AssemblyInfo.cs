@@ -5,16 +5,16 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BatMap - Convention-based fast mapper")]
-[assembly: AssemblyDescription("BatMap - The Mapper we deserve, not the one we need.")]
+[assembly: AssemblyDescription("BatMap - The Mapper we deserve, not the one we need. Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.")]
 #if DEBUG
  [assembly: AssemblyConfiguration("Debug")]
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif
 [assembly: AssemblyCompany("Doğuş Teknoloji")]
-[assembly: AssemblyProduct("BatMap")]
-[assembly: AssemblyCopyright("Copyright © 2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyProduct("BatMap: convention-based, fast object mapper")]
+[assembly: AssemblyCopyright("Copyright (c) 2017")]
+[assembly: AssemblyTrademark("BatMap")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -33,3 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.2")]
+[assembly: AssemblyFileVersion("0.2")]
