@@ -5,7 +5,7 @@ using BatMap.Benchmark.DTO;
 using BatMap.Benchmark.Model;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using FizzWare.NBuilder;
+using Giver;
 
 namespace BatMap.Benchmark {
 
@@ -14,29 +14,16 @@ namespace BatMap.Benchmark {
 
         static Program() {
             var rnd = new Random();
-            _customers = Builder<Customer>
-                .CreateListOfSize(1000)
-                .All()
-                .Do(c => {
-                    c.Addresses = Builder<Address>
-                        .CreateListOfSize(rnd.Next(3) + 1)
-                        .All()
-                        .Do(a => a.City = Builder<City>.CreateNew().Build())
-                        .Build()
-                        .ToList();
-                    c.Orders = Builder<Order>
-                        .CreateListOfSize(rnd.Next(10) + 1)
-                        .All()
-                        .Do(o => {
-                            o.OrderDetails = Builder<OrderDetail>
-                                .CreateListOfSize(rnd.Next(5) + 1)
-                                .Build()
-                                .ToList();
-                        })
-                        .Build()
-                        .ToList();
+            _customers = Give<Customer>.ToMe()
+                .With(c => {
+                    c.Addresses = Give<Address>.ToMe()
+                        .With(a => a.City = Give<City>.Single())
+                        .Now(rnd.Next(3) + 1);
+                    c.Orders = Give<Order>.ToMe()
+                        .With(o => o.OrderDetails = Give<OrderDetail>.Many(rnd.Next(5) + 1))
+                        .Now(rnd.Next(10) + 1);
                 })
-                .Build();
+                .Now(1000);
 
             Mapper.RegisterMap<Customer, CustomerDTO>();
             Mapper.RegisterMap<Address, AddressDTO>();
@@ -52,6 +39,7 @@ namespace BatMap.Benchmark {
                 cfg.CreateMap<OrderDetail, OrderDetailDTO>();
             });
 
+#if NET
             global::ExpressMapper.Mapper.Register<Customer, CustomerDTO>();
             global::ExpressMapper.Mapper.Register<Address, AddressDTO>();
             global::ExpressMapper.Mapper.Register<City, CityDTO>();
@@ -63,26 +51,11 @@ namespace BatMap.Benchmark {
             Nelibur.ObjectMapper.TinyMapper.Bind<City, CityDTO>();
             Nelibur.ObjectMapper.TinyMapper.Bind<Order, OrderDTO>();
             Nelibur.ObjectMapper.TinyMapper.Bind<OrderDetail, OrderDetailDTO>();
+#endif
         }
 
         static void Main() {
             BenchmarkRunner.Run<Program>();
-            //ManualTest();
-        }
-
-        /// <summary>
-        /// Used for benchmarking via [Visual Studio -> Analyze -> Performance Profiler]
-        /// </summary>
-        public static void ManualTest() {
-            var p = new Program();
-            p.BatMap();
-            p.HandWritten();
-            p.AutoMapper();
-            p.ExpressMapper();
-            p.FastMapper();
-            p.Mapster();
-            p.SafeMapper();
-            p.TinyMapper();
         }
 
         [Benchmark]
@@ -124,16 +97,19 @@ namespace BatMap.Benchmark {
             var customerDTOs = global::Mapster.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 
+#if NET
         [Benchmark]
         public void SafeMapper() {
             var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
         }
+#endif
 
         [Benchmark]
         public void AutoMapper() {
             var customerDTOs = _customers.Select(c => global::AutoMapper.Mapper.Map<CustomerDTO>(c)).ToList();
         }
 
+#if NET
         [Benchmark]
         public void TinyMapper() {
             var customerDTOs = _customers.Select(c => Nelibur.ObjectMapper.TinyMapper.Map<Customer, CustomerDTO>(c)).ToList();
@@ -148,5 +124,6 @@ namespace BatMap.Benchmark {
         public void FastMapper() {
             var customerDTOs = global::FastMapper.TypeAdapter.Adapt<IList<Customer>, List<CustomerDTO>>(_customers);
         }
+#endif
     }
 }

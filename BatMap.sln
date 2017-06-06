@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMap", "BatMap\BatMap.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMap.Tests", "BatMap.Tests\BatMap.Tests.csproj", "{0BA3B7DC-A8E5-4C1C-8D7F-5139D378BD22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMap.Benchmark", "BatMap.Benchmark\BatMap.Benchmark.csproj", "{C24F62B5-1F0C-45FC-B4E5-274D5C897349}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMap.Benchmark", "BatMap.Benchmark\BatMap.Benchmark.csproj", "{9DE35D63-1BF5-4FEE-8E48-63838FF5E3EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{0BA3B7DC-A8E5-4C1C-8D7F-5139D378BD22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BA3B7DC-A8E5-4C1C-8D7F-5139D378BD22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BA3B7DC-A8E5-4C1C-8D7F-5139D378BD22}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C24F62B5-1F0C-45FC-B4E5-274D5C897349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C24F62B5-1F0C-45FC-B4E5-274D5C897349}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C24F62B5-1F0C-45FC-B4E5-274D5C897349}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C24F62B5-1F0C-45FC-B4E5-274D5C897349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DE35D63-1BF5-4FEE-8E48-63838FF5E3EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DE35D63-1BF5-4FEE-8E48-63838FF5E3EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DE35D63-1BF5-4FEE-8E48-63838FF5E3EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DE35D63-1BF5-4FEE-8E48-63838FF5E3EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

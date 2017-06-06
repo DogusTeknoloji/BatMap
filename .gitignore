@@ -253,3 +253,4 @@ paket-files/
 /BatMap/.scannerwork
 /.scannerwork
 /opencoverCoverage.xml
+/BatMap.Benchmark/BenchmarkDotNet.Artifacts/results
