@@ -21,7 +21,7 @@ before_build:
 after_build:
 - dotnet pack BatMap\BatMap.csproj -c Release /p:Version=%appveyor_build_version%
 - appveyor PushArtifact BatMap\bin\%CONFIGURATION%\BatMap.%appveyor_build_version%.nupkg
-- dotnet BatMap.Benchmark\bin\%CONFIGURATION%\netcoreapp1.1\BatMap.Benchmark.exe
+- dotnet BatMap.Benchmark\bin\%CONFIGURATION%\netcoreapp1.1\BatMap.Benchmark.dll
 - BatMap.Benchmark\bin\%CONFIGURATION%\net46\BatMap.Benchmark.exe
 
 test_script:
