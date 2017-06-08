@@ -16,17 +16,20 @@ build:
   verbosity: minimal
   
 before_build:
-  - nuget restore
+  - dotnet restore
 
 after_build:
 - dotnet pack BatMap\BatMap.csproj -c Release /p:Version=%appveyor_build_version%
-- appveyor PushArtifact BatMap\bin\%CONFIGURATION%\BatMap.%appveyor_build_version%.nupkg
+- appveyor PushArtifact BatMap\bin\Release\BatMap.%appveyor_build_version%.nupkg
 - dotnet BatMap.Benchmark\bin\%CONFIGURATION%\netcoreapp1.1\BatMap.Benchmark.dll
 - BatMap.Benchmark\bin\%CONFIGURATION%\net46\BatMap.Benchmark.exe
 
 test_script:
-- packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:packages\NUnit.ConsoleRunner.3.6.1\tools\nunit3-console.exe -targetargs:BatMap.Tests\bin\%CONFIGURATION%\BatMap.Tests.dll -filter:"+[BatMap*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -output:opencoverCoverage.xml
-- packages\coveralls.net.0.7.0\tools\csmacnz.Coveralls.exe --opencover -i opencoverCoverage.xml --repoToken "%COVERALLS_REPO_TOKEN%" --useRelativePaths --commitId "%APPVEYOR_REPO_COMMIT%" --commitBranch "%APPVEYOR_REPO_BRANCH%" --commitAuthor "%APPVEYOR_REPO_COMMIT_AUTHOR%" --commitEmail "%APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL%" --commitMessage "%APPVEYOR_REPO_COMMIT_MESSAGE%" --jobId "%APPVEYOR_BUILD_NUMBER%" --serviceName appveyor
+- dotnet test -c %CONFIGURATION% BatMap.Tests\BatMap.Tests.csproj
+- nuget install OpenCover -Version 4.6.519 -OutputDirectory tools
+- .\tools\OpenCover.4.6.519\tools\OpenCover.Console.exe -target:"c:\Program Files\dotnet\dotnet.exe" -targetargs:"test -f netcoreapp1.1 -c %CONFIGURATION% BatMap.Tests/BatMap.Tests.csproj" -filter:"+[BatMap*]* -[BatMap.*Tests*]*" -output:opencoverCoverage.xml -oldStyle -register:user
+- nuget install coveralls.net -Version 0.7.0 -OutputDirectory tools
+- .\tools\coveralls.net.0.7.0\tools\csmacnz.Coveralls.exe --opencover -i opencoverCoverage.xml --repoToken "%COVERALLS_REPO_TOKEN%" --useRelativePaths --commitId "%APPVEYOR_REPO_COMMIT%" --commitBranch "%APPVEYOR_REPO_BRANCH%" --commitAuthor "%APPVEYOR_REPO_COMMIT_AUTHOR%" --commitEmail "%APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL%" --commitMessage "%APPVEYOR_REPO_COMMIT_MESSAGE%" --jobId "%APPVEYOR_BUILD_NUMBER%" --serviceName appveyor
 
 deploy:
   provider: NuGet
