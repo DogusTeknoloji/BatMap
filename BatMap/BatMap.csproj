@@ -29,4 +29,9 @@
     <DefineConstants>NO_AssemblyBuilder</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
 </Project>
