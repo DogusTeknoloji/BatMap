@@ -21,8 +21,6 @@ before_build:
 after_build:
 - dotnet pack BatMap\BatMap.csproj -c Release /p:Version=%appveyor_build_version%
 - appveyor PushArtifact BatMap\bin\Release\BatMap.%appveyor_build_version%.nupkg
-- dotnet BatMap.Benchmark\bin\%CONFIGURATION%\netcoreapp1.1\BatMap.Benchmark.dll
-- BatMap.Benchmark\bin\%CONFIGURATION%\net46\BatMap.Benchmark.exe
 
 test_script:
 - dotnet test -c %CONFIGURATION% BatMap.Tests\BatMap.Tests.csproj
@@ -30,6 +28,8 @@ test_script:
 - .\tools\OpenCover.4.6.519\tools\OpenCover.Console.exe -target:"c:\Program Files\dotnet\dotnet.exe" -targetargs:"test -f netcoreapp1.1 -c %CONFIGURATION% BatMap.Tests/BatMap.Tests.csproj" -filter:"+[BatMap*]* -[BatMap.*Tests*]*" excludebyattribute:*.ExcludeFromCodeCoverage* -output:opencoverCoverage.xml -oldStyle -register:user
 - nuget install coveralls.net -Version 0.7.0 -OutputDirectory tools
 - .\tools\coveralls.net.0.7.0\tools\csmacnz.Coveralls.exe --opencover -i opencoverCoverage.xml --repoToken "%COVERALLS_REPO_TOKEN%" --useRelativePaths --commitId "%APPVEYOR_REPO_COMMIT%" --commitBranch "%APPVEYOR_REPO_BRANCH%" --commitAuthor "%APPVEYOR_REPO_COMMIT_AUTHOR%" --commitEmail "%APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL%" --commitMessage "%APPVEYOR_REPO_COMMIT_MESSAGE%" --jobId "%APPVEYOR_BUILD_NUMBER%" --serviceName appveyor
+- dotnet BatMap.Benchmark\bin\%CONFIGURATION%\netcoreapp1.1\BatMap.Benchmark.dll
+- BatMap.Benchmark\bin\%CONFIGURATION%\net46\BatMap.Benchmark.exe
 
 deploy:
   provider: NuGet
