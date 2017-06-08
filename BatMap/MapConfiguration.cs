@@ -16,19 +16,14 @@ namespace BatMap {
 
         static MapConfiguration() {
 #if NET_STANDARD
-            var methods = typeof(MapConfiguration).GetRuntimeMethods();
+            var methods = typeof(MapConfiguration).GetRuntimeMethods().ToList();
 #else
-            var methods = typeof(MapConfiguration).GetMethods();
+            var methods = typeof(MapConfiguration).GetMethods().ToList();
 #endif
 
-#if NO_HasDefaultValue
             _registerMapMethod = methods
                 .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod
                             && mi.GetParameters().First().ParameterType.GetGenericTypeDefinition() == typeof(Action<>));
-#else
-            _registerMapMethod = methods
-                    .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod && mi.GetParameters().First().HasDefaultValue);
-#endif
             _generateMapDefinitionMethod = methods
                     .First(mi => mi.Name == "GenerateMapDefinition" && mi.IsGenericMethod);
         }

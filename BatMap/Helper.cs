@@ -97,7 +97,16 @@ namespace BatMap {
             if (memberExp != null) {
                 retVal.AddRange(GetMemberPath(memberExp.Expression));
                 retVal.Add(memberExp.Member.Name);
+                return retVal;
             }
+
+            var unaryExp = exp as UnaryExpression;
+            if (unaryExp != null)
+                return GetMemberPath(unaryExp.Operand);
+
+            var lambdaExp = exp as LambdaExpression;
+            if (lambdaExp != null)
+                return GetMemberPath(lambdaExp.Body);
 
             return retVal;
         }

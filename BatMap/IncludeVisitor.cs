@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -25,6 +24,10 @@ namespace BatMap {
                         _includes.Add(navs);
                     }
                 }
+            }
+            else if (m.Method.Name == "Include") {
+                var memberExp = m.Arguments[1];
+                _includes.Add(Helper.GetMemberPath(memberExp));
             }
 
             return base.VisitMethodCall(m);

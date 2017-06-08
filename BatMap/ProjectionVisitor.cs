@@ -83,12 +83,12 @@ namespace BatMap {
                         node.Method.GetGenericArguments()[1]
                     }, node.Arguments[0], subValue);
 
-#if NO_GenericTypeArguments
-                    var typeArg = node.Method.ReturnType.GetGenericArguments()[0];
-#else
+#if NET_STANDARD
                     var typeArg = node.Method.ReturnType.GenericTypeArguments[0];
+#else
+                    var typeArg = node.Method.ReturnType.GetGenericArguments()[0];
 #endif
-                    return Expression.Call(typeof(Enumerable), methodName, new[] { typeArg }, subProjector);
+                        return Expression.Call(typeof(Enumerable), methodName, new[] { typeArg }, subProjector);
                 }
                 default:
                     throw new InvalidOperationException(

@@ -3,106 +3,99 @@ using System.Collections.Generic;
 using System.Linq;
 using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
-using FizzWare.NBuilder;
-using NUnit.Framework;
+using Xunit;
+using Giver;
 
 namespace BatMap.Tests {
 
-    [TestFixture]
     public class ComplexDataTests {
         private readonly IList<Order> _orders;
 
         public ComplexDataTests() {
             var random = new Random();
 
-            var products = Builder<Product>
-                .CreateListOfSize(15)
-                .All()
-                .Do(p => p.Supplier = Builder<Company>.CreateNew().Build())
-                .Build();
+            var products = Give<Product>
+                .ToMe(p => p.Supplier = Give<Company>.Single())
+                .Now(15);
 
-            _orders = Builder<Order>
-                .CreateListOfSize(10)
-                .All()
-                .Do(o => {
-                    o.OrderDetails = Builder<OrderDetail>
-                        .CreateListOfSize(3)
-                        .All()
-                        .Do(od => od.Product = products[random.Next(15)])
-                        .Build();
+            _orders = Give<Order>
+                .ToMe(o => {
+                    o.OrderDetails = Give<OrderDetail>
+                        .ToMe(od => od.Product = products[random.Next(15)])
+                        .Now(3);
                 })
-                .Build();
+                .Now(10);
 
             _orders[5].OrderDetails[1].Product = products[9];
             _orders[7].OrderDetails[1].Product = products[9];
         }
 
-        [Test]
+        [Fact]
         public void Map_Orders() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
             var dtoList = config.Map<Order, OrderDTO>(_orders).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
 
-        [Test]
+        [Fact]
         public void Map_Orders_PreserveReferences() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
             var dtoList = config.Map<Order, OrderDTO>(_orders, true).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[5].OrderDetails.ToList()[1].Product,
                 dtoList[7].OrderDetails.ToList()[1].Product
             );
         }
 
-        [Test]
+        [Fact]
         public void Map_Orders_PreserveReferences_2() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
-            var order = Builder<Order>.CreateNew().Build();
-            var orderDetail = Builder<OrderDetail>.CreateNew().Build();
+            var order = Give<Order>.Single();
+            var orderDetail = Give<OrderDetail>.Single();
 
             order.OrderDetails = new List<OrderDetail> { orderDetail };
             orderDetail.Order = order;
 
             var orderDto = config.Map<OrderDTO>(order, true);
 
-            Assert.AreEqual(orderDto, orderDto.OrderDetails.First().Order);
+            Assert.Equal(orderDto, orderDto.OrderDetails.First().Order);
         }
 
-        [Test]
+        [Fact]
         public void Map_Orders_With_SkipMember() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>(b => {
                 b.SkipMember(o => o.Price);
             });
 
-            var order = Builder<Order>.CreateNew().Build();
+            var order = Give<Order>.Single();
             var orderDto = config.Map<OrderDTO>(order);
 
-            Assert.AreNotEqual(order.Price, orderDto.Price);
+            Assert.NotEqual(order.Price, orderDto.Price);
         }
 
-        [Test]
+        [Fact]
         public void Map_Orders_With_MapMember() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>(b => {
                 b.MapMember(o => o.Price, (o, mc) => o.Price * 3);
             });
 
-            var order = Builder<Order>.CreateNew().Build();
+            var order = Give<Order>.Single();
             var orderDto = config.Map<OrderDTO>(order);
 
-            Assert.IsTrue(orderDto.Price.Equals(order.Price * 3));
+            Assert.True(orderDto.Price.Equals(order.Price * 3));
         }
 
-        [Test]
+        [Fact]
         public void Map_Orders_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
@@ -120,18 +113,18 @@ namespace BatMap.Tests {
 
             var dtoList = config.Map<Order, OrderDTO>(_orders).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].SubPrice,
                 _orders[3].OrderDetails[2].UnitPrice * _orders[3].OrderDetails[2].Count
             );
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
 
-        [Test]
+        [Fact]
         public void Map_Order_To_Existing() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>();
@@ -143,11 +136,11 @@ namespace BatMap.Tests {
             var dto = new OrderDTO();
             var mapDto = config.MapTo(entity, dto);
 
-            Assert.AreSame(dto, mapDto);
-            Assert.AreEqual(dto.OrderDetails.Count, entity.OrderDetails.Count);
+            Assert.Same(dto, mapDto);
+            Assert.Equal(dto.OrderDetails.Count, entity.OrderDetails.Count);
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_With_Navigations() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
             config.RegisterMap<OrderDetail, OrderDetailDTO>(b => b.SkipMember(od => od.Order));
@@ -157,13 +150,13 @@ namespace BatMap.Tests {
             var func = Helper.CreateProjector(projector);
             var dtoList = _orders.Select(func).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Id,
                 _orders[3].OrderDetails[2].Product.Id
             );
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_Without_Navigations() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>();
@@ -172,10 +165,10 @@ namespace BatMap.Tests {
             var func = Helper.CreateProjector(projector);
             var dtoList = _orders.Select(func).ToList();
 
-            Assert.IsNull(dtoList[3].OrderDetails);
+            Assert.Null(dtoList[3].OrderDetails);
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_With_IncludePath() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
@@ -183,15 +176,15 @@ namespace BatMap.Tests {
             var func = Helper.CreateProjector(projector);
             var dtoList = _orders.Select(func).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Id,
                 _orders[3].OrderDetails[2].Id
             );
 
-            Assert.IsNull(dtoList[3].OrderDetails.ToList()[2].Product);
+            Assert.Null(dtoList[3].OrderDetails.ToList()[2].Product);
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
@@ -211,18 +204,18 @@ namespace BatMap.Tests {
             var func = Helper.CreateProjector(projector);
             var dtoList = _orders.Select(func).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].SubPrice,
                 _orders[3].OrderDetails[2].UnitPrice * _orders[3].OrderDetails[2].Count
             );
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_Custom_Expression_2() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
@@ -239,18 +232,18 @@ namespace BatMap.Tests {
             var func = Helper.CreateProjector(projector);
             var dtoList = _orders.Select(func).ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].Price,
                 _orders[3].OrderDetails.Sum(od => od.UnitPrice)
             );
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
 
-        [Test]
+        [Fact]
         public void Project_Invalid_Method_Throws_Exception() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {

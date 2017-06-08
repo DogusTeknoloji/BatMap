@@ -3,36 +3,31 @@ using System.Linq;
 using System.Reflection;
 using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
-using FizzWare.NBuilder;
-using NUnit.Framework;
+using Xunit;
+using Giver;
 
 namespace BatMap.Tests {
 
     /// <summary>
     /// Tests only static API method signatures.
     /// </summary>
-    [TestFixture]
     public class StaticTests {
         public IList<Customer> Customers;
 
         public StaticTests() {
-            Customers = Builder<Customer>
-                .CreateListOfSize(5)
-                .All()
-                .Do(c => {
-                    var addresses = Builder<Address>
-                        .CreateListOfSize(3)
-                        .All()
-                        .Do(a => a.City = Builder<City>.CreateNew().Build())
-                        .Build();
+            Customers = Give<Customer>
+                .ToMe(c => {
+                    var addresses = Give<Address>
+                        .ToMe(a => a.City = Give<City>.Single())
+                        .Now(3);
 
                     c.Addresses = addresses;
                     c.MainAddress = addresses[0];
                 })
-                .Build();
+                .Now(5);
         }
 
-        [Test]
+        [Fact]
         public void Static_Availability_Test() {
             // check if all instance methods are also available as static API and static API does not have any extra method
             var skipMethods = new[] { "GetProjector", "GetMapDefinition", "GenerateMapDefinition" };
@@ -41,107 +36,107 @@ namespace BatMap.Tests {
                 .ToList();
             var staticMethods = typeof(Mapper).GetMethods(BindingFlags.Static | BindingFlags.Public).ToList();
             
-            Assert.IsTrue(instanceMethods.Count == staticMethods.Count 
+            Assert.True(instanceMethods.Count == staticMethods.Count 
                 && instanceMethods.All(m => staticMethods.Any(sm =>
                     m.Name == sm.Name && m.ToString() == sm.ToString()
                 ))
             );
         }
 
-        [Test]
+        [Fact]
         public void Register() {
             Mapper.RegisterMap<Customer, CustomerDTO>(b => {
                 b.SkipMember(c => c.Endorsement);
             });
         }
 
-        [Test]
+        [Fact]
         public void Register_With_Type() {
             Mapper.RegisterMap(typeof(City), typeof(CityDTO));
         }
 
-        [Test]
+        [Fact]
         public void Register_With_Expression() {
             Mapper.RegisterMap<City, CityDTO>((c, mc) => new CityDTO { Id = c.Id, Name = c.Name, Population = c.Population });
         }
 
-        [Test]
+        [Fact]
         public void Map_Two_Generic() {
             var entity = Customers[0];
             var dto = Mapper.Map<Customer, CustomerDTO>(entity, false);
 
-            Assert.AreEqual(entity.Id, dto.Id);
+            Assert.Equal(entity.Id, dto.Id);
         }
 
-        [Test]
+        [Fact]
         public void Map_To_Existing() {
             var entity = Customers[0];
             var dto = new CustomerDTO();
             var mapDto = Mapper.MapTo(entity, dto, true);
 
-            Assert.AreSame(dto, mapDto);
-            Assert.AreEqual(entity.Id, dto.Id);
+            Assert.Same(dto, mapDto);
+            Assert.Equal(entity.Id, dto.Id);
         }
 
-        [Test]
+        [Fact]
         public void Map_Generic() {
             var entity = Customers[0];
             var dto = Mapper.Map<CustomerDTO>(entity, true);
 
-            Assert.AreEqual(entity.Id, dto.Id);
+            Assert.Equal(entity.Id, dto.Id);
         }
 
-        [Test]
+        [Fact]
         public void Map_Without_Destination() {
             var entity = Customers[0];
             var dto = Mapper.Map(entity);
 
-            Assert.IsInstanceOf(typeof(CustomerDTO), dto);
+            Assert.IsAssignableFrom<CustomerDTO>(dto);
         }
 
-        [Test]
+        [Fact]
         public void Map_With_Destination() {
             var entity = Customers[0];
             var dto = Mapper.Map(entity, typeof(CustomerDTO));
 
-            Assert.IsInstanceOf(typeof(CustomerDTO), dto);
+            Assert.IsAssignableFrom<CustomerDTO>(dto);
         }
 
-        [Test]
+        [Fact]
         public void Map_Enumerable() {
             var dtos = Customers.Map<Customer, CustomerDTO>();
 
-            Assert.AreEqual(dtos.Count(), Customers.Count);
+            Assert.Equal(dtos.Count(), Customers.Count);
         }
 
-        [Test]
+        [Fact]
         public void Map_Dictionary() {
             var dict = Customers.ToDictionary(c => c.Id, c => c);
             var dtoDict = Mapper.Map<int, Customer, int, CustomerDTO>(dict);
 
-            Assert.IsTrue(dtoDict.All(kvp => kvp.Key == kvp.Value.Id));
+            Assert.True(dtoDict.All(kvp => kvp.Key == kvp.Value.Id));
         }
        
-        [Test]
+        [Fact]
         public void Queryable_ProjectTo() {
             var addresses = Customers.First().Addresses;
             var dtos = addresses.AsQueryable().ProjectTo<AddressDTO>(false);
 
-            Assert.AreEqual(dtos.Count(), addresses.Count);
+            Assert.Equal(dtos.Count(), addresses.Count);
         }
 
-        [Test]
+        [Fact]
         public void Queryable_ProjectTo_With_Expression() {
             var dtos = Customers.AsQueryable().ProjectTo<Customer, CustomerDTO>(c => c.Addresses.Select(a => a.City));
 
-            Assert.AreEqual(dtos.Count(), Customers.Count);
+            Assert.Equal(dtos.Count(), Customers.Count);
         }
 
-        [Test]
+        [Fact]
         public void Queryable_ProjectTo_With_Include() {
             var dtos = Customers.AsQueryable().ProjectTo<CustomerDTO>(new IncludePath("Addresses"));
 
-            Assert.AreEqual(dtos.Count(), Customers.Count);
+            Assert.Equal(dtos.Count(), Customers.Count);
         }
     }
 }

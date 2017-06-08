@@ -1,116 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Entity;
 using System.Linq;
+#if NET_CORE
+using Microsoft.EntityFrameworkCore;
+#else
+using System.Data.Entity;
+#endif
 using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
-using FizzWare.NBuilder;
-using Moq;
-using NUnit.Framework;
+using Xunit;
+using Giver;
 
 namespace BatMap.Tests {
 
-    [TestFixture]
-    public class EntityFrameworkTests {
+    public class QueryableTests {
         private readonly IList<Order> _orders;
 
-        public EntityFrameworkTests() {
+        public QueryableTests() {
             var random = new Random();
 
-            var products = Builder<Product>
-                .CreateListOfSize(15)
-                .All()
-                .Do(p => p.Supplier = Builder<Company>.CreateNew().Do(s => s.Addresses = Builder<Address>.CreateListOfSize(2).Build()).Build())
-                .Build();
+            var products = Give<Product>
+                .ToMe(p => p.Supplier = Give<Company>.ToMe(s => s.Addresses = Give<Address>.Many(2)).Now())
+                .Now(15);
 
-            _orders = Builder<Order>
-                .CreateListOfSize(10)
-                .All()
-                .Do(o => {
-                    o.OrderDetails = Builder<OrderDetail>
-                        .CreateListOfSize(3)
-                        .All()
-                        .Do(od => od.Product = products[random.Next(15)])
-                        .Build();
+            _orders = Give<Order>
+                .ToMe(o => {
+                    o.OrderDetails = Give<OrderDetail>
+                        .ToMe(od => od.Product = products[random.Next(15)])
+                        .Now(3);
                 })
-                .Build();
+                .Now(10);
         }
 
-        [Test]
+        [Fact]
         public void Get_Includes() {
-            var context = new TestEntities();
+            var context = TestEntities.Create();
             var q = context.Orders
                 .Include(o => o.OrderDetails.Select(od => od.Product.Supplier.Addresses.Select(a => a.City)))
                 .Include(o => o.OrderDetails.Select(od => od.Product.Supplier.MainAddress));
 
             var oIncludes = Helper.GetIncludes(q).FirstOrDefault();
-            Assert.NotNull(oIncludes);
+            Assert.True(oIncludes != null && oIncludes.Member == "OrderDetails");
 
             var odInclude = oIncludes.Children.FirstOrDefault();
-            Assert.NotNull(odInclude);
+            Assert.True(odInclude != null && odInclude.Member == "Product");
 
             var pInclude = odInclude.Children.FirstOrDefault();
-            Assert.NotNull(pInclude);
+            Assert.True(pInclude != null && pInclude.Member == "Supplier");
 
-            Assert.AreEqual(pInclude.Children.Count(), 2);
+            Assert.Equal(pInclude.Children.Count(), 2);
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>();
             config.RegisterMap<OrderDetail, OrderDetailDTO>();
             config.RegisterMap<Product, ProductDTO>();
 
-            var mockContext = new Mock<TestEntities>();
-            var observableOrders = new ObservableCollection<Order>(_orders);
-            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
-
-            var query = mockContext.Object.Orders;
+            var query = _orders.AsQueryable();
             var dtoQuery = config.ProjectTo<OrderDTO>(query);
             var dtoList = dtoQuery.ToList();
 
-            Assert.IsNull(dtoList[3].OrderDetails);
+            Assert.Null(dtoList[3].OrderDetails);
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_With_Details_Product_Company() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
-            var mockContext = new Mock<TestEntities>();
-            var observableOrders = new ObservableCollection<Order>(_orders);
-            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
-
-            var query = mockContext.Object.Orders;
+            var query = _orders.AsQueryable();
             var dtoQuery = config.ProjectTo<Order, OrderDTO>(query, o => o.OrderDetails.Select(od => od.Product.Supplier));
             var dtoList = dtoQuery.ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_With_Details_Product_Company_2() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
-            var mockContext = new Mock<TestEntities>();
-            var observableOrders = new ObservableCollection<Order>(_orders);
-            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
-
-            var query = mockContext.Object.Orders;
+            var query = _orders.AsQueryable();
             var dtoQuery = config.ProjectTo<Order, OrderDTO>(query, o => o.OrderDetails.Select(od => od.Product).Select(p => p.Supplier));
             var dtoList = dtoQuery.ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_Custom_Expression() {
             // we aren't registering OrderDetail-OrderDetailDTO because we declare the custom mapping
             // even we don't include OrderDetail in the query, it will be mapped
@@ -126,20 +109,16 @@ namespace BatMap.Tests {
                 Price = o.Price
             });
 
-            var mockContext = new Mock<TestEntities>();
-            var observableOrders = new ObservableCollection<Order>(_orders);
-            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
-
-            var query = mockContext.Object.Orders;
+            var query = _orders.AsQueryable();
             var dtoQuery = config.ProjectTo<OrderDTO>(query, new IncludePath[] { });
             var dtoList = dtoQuery.ToList();
 
-            Assert.IsNotNull(dtoList[3].OrderDetails);
-            Assert.AreEqual(dtoList[3].OrderDetails.Count, _orders[3].OrderDetails.Count);
-            Assert.IsTrue(dtoList.All(o => o.OrderDetails.All(od => od.Product == null)));
+            Assert.NotNull(dtoList[3].OrderDetails);
+            Assert.Equal(dtoList[3].OrderDetails.Count, _orders[3].OrderDetails.Count);
+            Assert.True(dtoList.All(o => o.OrderDetails.All(od => od.Product == null)));
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_Custom_Expression2() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
@@ -156,20 +135,16 @@ namespace BatMap.Tests {
             // similar custom mapping. but this time we need to register OrderDetail-OrderDetailDTO to allow MapContext to do the mapping
             config.RegisterMap<OrderDetail, OrderDetailDTO>();
 
-            var mockContext = new Mock<TestEntities>();
-            var observableOrders = new ObservableCollection<Order>(_orders);
-            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
-
-            var query = mockContext.Object.Orders;
+            var query = _orders.AsQueryable();
             var dtoQuery = config.ProjectTo<OrderDTO>(query, new IncludePath[] { });
             var dtoList = dtoQuery.ToList();
 
-            Assert.IsNotNull(dtoList[3].OrderDetails);
-            Assert.AreEqual(dtoList[3].OrderDetails.Count, _orders[3].OrderDetails.Count);
-            Assert.IsTrue(dtoList.All(o => o.OrderDetails.All(od => od.Product == null)));
+            Assert.NotNull(dtoList[3].OrderDetails);
+            Assert.Equal(dtoList[3].OrderDetails.Count, _orders[3].OrderDetails.Count);
+            Assert.True(dtoList.All(o => o.OrderDetails.All(od => od.Product == null)));
         }
 
-        [Test]
+        [Fact]
         public void Project_Orders_With_Details_Product_Supplier_Custom_Expression() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>((o, mc) => new OrderDTO {
@@ -185,32 +160,16 @@ namespace BatMap.Tests {
             config.RegisterMap<Product, ProductDTO>();
             config.RegisterMap<Company, CompanyDTO>();
 
-            var mockContext = new Mock<TestEntities>();
-            var observableOrders = new ObservableCollection<Order>(_orders);
-            mockContext.Setup(p => p.Orders).Returns(GetMockSet(observableOrders).Object);
-
-            var query = mockContext.Object.Orders;
+            var query = _orders.AsQueryable();
             var dtoQuery = config.ProjectTo<Order, OrderDTO>(query, o => o.OrderDetails.Select(od => od.Product).Select(p => p.Supplier));
             var dtoList = dtoQuery.ToList();
 
-            Assert.AreEqual(
+            Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
                 _orders[3].OrderDetails[2].Product.Supplier.CompanyName
             );
 
-            Assert.IsNull(dtoList[3].OrderDetails.ToList()[2].Product.Supplier.Addresses);
-        }
-
-        private static Mock<DbSet<T>> GetMockSet<T>(IEnumerable<T> list) where T : class {
-            var queryable = list.AsQueryable();
-            var mockList = new Mock<DbSet<T>>(MockBehavior.Loose);
-
-            mockList.As<IQueryable<T>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            mockList.As<IQueryable<T>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            mockList.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            mockList.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(queryable.GetEnumerator());
-
-            return mockList;
+            Assert.Null(dtoList[3].OrderDetails.ToList()[2].Product.Supplier.Addresses);
         }
     }
 }
