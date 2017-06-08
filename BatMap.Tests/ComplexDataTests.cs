@@ -257,5 +257,19 @@ namespace BatMap.Tests {
 
             Assert.Throws<InvalidOperationException>(() => config.GetProjector<Order, OrderDTO>(o => o.OrderDetails.Select(od => od.Product.Supplier)));
         }
+
+        [Fact]
+        public void Get_Property_Value() {
+            var order = Give<Order>.Single();
+
+            Assert.Equal(Helper.GetPropertyValue(order, "OrderNo"), order.OrderNo);
+        }
+
+        [Fact]
+        public void Get_Field_Value() {
+            var order = Give<Order>.Single();
+
+            Assert.Equal(Helper.GetFieldValue(order, "Price"), order.Price);
+        }
     }
 }

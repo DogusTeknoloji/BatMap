@@ -162,6 +162,24 @@ namespace BatMap.Tests {
         }
 
         [Fact]
+        public void Map_To_Collection_Property() {
+            var entity = Give<ForTest5>
+                .ToMe(c => {
+                    c.Cities = new Collection<City>(Give<City>.Many(10));
+                })
+                .Now();
+
+            var config = new MapConfiguration();
+            config.RegisterMap<ForTest5, ForTest5DTO>((e, mc) => new ForTest5DTO {
+                Cities = mc.MapToCollection<City, CityDTO>(e.Cities)
+            });
+            config.RegisterMap<City, CityDTO>();
+            var dto = config.Map<ForTest5, ForTest5DTO>(entity);
+
+            Assert.True(dto.Cities[2].Name == entity.Cities[2].Name);
+        }
+
+        [Fact]
         public void Map_HashSet_Property() {
             var entities = Give<ForTest6>
                 .ToMe(c => {
