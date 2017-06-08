@@ -250,7 +250,10 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
 /BatMap/.scannerwork
 /.scannerwork
 /opencoverCoverage.xml
 /BatMap.Benchmark/BenchmarkDotNet.Artifacts/results
+/tools
+/results.xml
