@@ -74,7 +74,7 @@ Note: If you want to change mapping behavior, create a class that inherits from 
 
 ## Where can I get it?
 
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [BatMap](https://www.nuget.org/packages/BatMap/) from the package manager console:
+You can install [BatMap](https://www.nuget.org/packages/BatMap/) from the package manager console:
 
 ```
 PM> Install-Package BatMap
