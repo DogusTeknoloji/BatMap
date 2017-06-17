@@ -1,7 +1,7 @@
 # BatMap - The Mapper we deserve, not the one we need.
 <img src="https://image.ibb.co/jDUyWQ/logo_64x64.png" alt="🦇 BatMap" align="middle"> **Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.** 
 
-Support .Net Standard 1.0.
+Supports .Net Standard 1.0.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/fm2snjwobq0k7r9u?svg=true)](https://ci.appveyor.com/project/DogusTeknoloji/batmap)
 [![Coverage Status](https://coveralls.io/repos/github/DogusTeknoloji/BatMap/badge.svg?branch=master)](https://coveralls.io/github/DogusTeknoloji/BatMap?branch=master)
