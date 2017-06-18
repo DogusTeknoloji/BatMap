@@ -163,20 +163,22 @@ namespace BatMap.Tests {
 
         [Fact]
         public void Map_To_Collection_Property() {
-            var entity = Give<ForTest5>
+            var entities = Give<ForTest5>
                 .ToMe(c => {
                     c.Cities = new Collection<City>(Give<City>.Many(10));
                 })
-                .Now();
+                .Now(5);
+            entities[4].Cities = null;
 
             var config = new MapConfiguration();
             config.RegisterMap<ForTest5, ForTest5DTO>((e, mc) => new ForTest5DTO {
                 Cities = mc.MapToCollection<City, CityDTO>(e.Cities)
             });
             config.RegisterMap<City, CityDTO>();
-            var dto = config.Map<ForTest5, ForTest5DTO>(entity);
+            var dtos = config.Map<ForTest5, ForTest5DTO>(entities).ToList();
 
-            Assert.True(dto.Cities[2].Name == entity.Cities[2].Name);
+            Assert.True(dtos[3].Cities[2].Name == entities[3].Cities[2].Name);
+            Assert.Null(dtos[4].Cities);
         }
 
         [Fact]
