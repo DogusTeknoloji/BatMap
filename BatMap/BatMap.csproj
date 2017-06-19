@@ -3,17 +3,16 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;net40;net45</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <PackageId>BatMap</PackageId>
     <Authors>Umut Özel - Doğuş Teknoloji</Authors>
+    <description>BatMap - The Mapper we deserve, not the one we need. 
+Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.</description>
+    <copyright>Copyright (c) 2017</copyright>
     <PackageLicenseUrl>https://github.com/DogusTeknoloji/BatMap/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/DogusTeknoloji/BatMap</PackageProjectUrl>
     <PackageIconUrl>https://image.ibb.co/itRs6Q/logo.png</PackageIconUrl>
+    <PackageTags>Mapper Projector Mapping Entity DTO</PackageTags>
     <RepositoryUrl>https://github.com/DogusTeknoloji/BatMap</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Mapper Projector Mapping Entity DTO</PackageTags>
-    <title>BatMap: convention-based, fast object mapper</title>
-    <description>BatMap - The Mapper we deserve, not the one we need. Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.</description>
-    <copyright>Copyright (c) 2017</copyright>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
