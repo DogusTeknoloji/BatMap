@@ -295,13 +295,15 @@ namespace BatMap.Tests {
             var img = Enumerable.Range(0, 100).Select(i => (byte)rnd.Next(255));
             var entity = new ForTest7 {
                 Image1 = img.ToArray(),
-                Image2 = img.Select(i => (int)i).ToList()
+                Image2 = img.Select(i => (int)i).ToList(),
+                Image3 = new HashSet<byte>(img)
             };
 
             var dto = config.Map<ForTest7DTO>(entity);
 
             Assert.True(Enumerable.SequenceEqual(entity.Image1.Select(b => (int)b), dto.Image1));
             Assert.True(Enumerable.SequenceEqual(entity.Image2, dto.Image2.Select(b => (int)b)));
+            Assert.True(Enumerable.SequenceEqual(entity.Image3, dto.Image3));
         }
     }
 }

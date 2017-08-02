@@ -14,6 +14,8 @@ namespace BatMap {
         protected static readonly MethodInfo MapToDictionaryMethod;
         protected static readonly MethodInfo MapToCollectionTypeMethod;
         protected static readonly MethodInfo SelectMethod;
+        protected static readonly MethodInfo ToListMethod;
+        protected static readonly MethodInfo ToArrayMethod;
 
         static ExpressionProvider() {
 #if NET_STANDARD
@@ -30,9 +32,13 @@ namespace BatMap {
 #if NET_STANDARD
             SelectMethod = typeof(Enumerable).GetRuntimeMethods()
                 .First(m => m.Name == "Select" && m.GetParameters().Last().ParameterType.GenericTypeArguments.Length == 2);
+            ToListMethod = typeof(Enumerable).GetRuntimeMethods().First(m => m.Name == "ToList");
+            ToArrayMethod = typeof(Enumerable).GetRuntimeMethods().First(m => m.Name == "ToArray");
 #else
             SelectMethod = typeof(Enumerable).GetMethods()
                 .First(m => m.Name == "Select" && m.GetParameters().Last().ParameterType.GetGenericArguments().Length == 2);
+            ToListMethod = typeof(Enumerable).GetMethod("ToList");
+            ToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
 #endif
         }
 
@@ -158,38 +164,54 @@ namespace BatMap {
                 );
             }
 
-            MethodInfo copyMethod;
-#if NET_STANDARD
+            MethodInfo copyMethod = null;
             var outList = typeof(List<>).MakeGenericType(outGenericType);
+#if NET_STANDARD
             if (outMember.Type.GetTypeInfo().IsAssignableFrom(outList.GetTypeInfo())) {
-                copyMethod = typeof(Enumerable).GetRuntimeMethods().First(m => m.Name == "ToList");
+                copyMethod = ToListMethod;
             }
             else if (outMember.Type.IsArray) {
-                copyMethod = typeof(Enumerable).GetRuntimeMethods().First(m => m.Name == "ToArray");
-            }
-            else {
-                throw new NotSupportedException();
+                copyMethod = ToArrayMethod;
             }
 #else
-            var outList = typeof(List<>).MakeGenericType(outGenericType);
             if (outMember.Type.IsAssignableFrom(outList)) {
-                copyMethod = typeof(Enumerable).GetMethod("ToList");
+                copyMethod = ToListMethod;
             }
             else if (outMember.Type.IsArray) {
-                copyMethod = typeof(Enumerable).GetMethod("ToArray");
-            }
-            else {
-                throw new NotSupportedException();
+                copyMethod = ToArrayMethod;
             }
 #endif
+            Expression copyExp;
+            if (copyMethod != null) {
+                copyMethod = copyMethod.MakeGenericMethod(outGenericType);
+                copyExp = Expression.Call(null, copyMethod, inMemberExp);
+            }
+            else {
+#if NET_STANDARD
+                var outCtor = outMember.Type.GetTypeInfo().DeclaredConstructors.FirstOrDefault(
+                    c => {
+                        var prms = c.GetParameters();
+                        return prms.Length == 1 && prms.First().ParameterType.GetTypeInfo().IsAssignableFrom(outList.GetTypeInfo());
+                    }
+                );
+#else
+                var outCtor = outMember.Type.GetConstructors().FirstOrDefault(
+                    c => {
+                        var prms = c.GetParameters();
+                        return prms.Length == 1 && prms.First().ParameterType.IsAssignableFrom(outList);
+                    }
+                );
+#endif
+                if (outCtor == null)
+                    throw new NotSupportedException($"{outMember.Type} does not have a suitable constructor for mapping.");
+                
+                copyExp = Expression.New(
+                    outCtor,
+                    Expression.Call(null, ToListMethod.MakeGenericMethod(outGenericType), inMemberExp)
+                );
+            }
 
-            copyMethod = copyMethod.MakeGenericMethod(outGenericType);
-            var copyExp = Expression.Call(
-                null,
-                copyMethod,
-                inMemberExp
-            );
-            var nullExp = Expression.Constant(null, copyMethod.ReturnType);
+            var nullExp = Expression.Constant(null, outMember.Type);
             var conditionExp = Expression.Condition(
                 Expression.Equal(orgInMemberExp, Expression.Constant(null)),
                 nullExp,

@@ -31,5 +31,6 @@ namespace BatMap.Tests.Model {
     public class ForTest7 {
         public byte[] Image1 { get; set; }
         public List<int> Image2 { get; set; }
+        public ICollection<byte> Image3 { get; set; }
     }
 }
