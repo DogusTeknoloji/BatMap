@@ -285,5 +285,23 @@ namespace BatMap.Tests {
 
             Assert.Null(config.Map<Customer, CustomerDTO>((IEnumerable<Customer>)null));
         }
+
+        [Fact]
+        public void Map_Primitive_Enumerable() {
+            var config = new MapConfiguration();
+            config.RegisterMap<ForTest7, ForTest7DTO>();
+
+            var rnd = new Random();
+            var img = Enumerable.Range(0, 100).Select(i => (byte)rnd.Next(255));
+            var entity = new ForTest7 {
+                Image1 = img.ToArray(),
+                Image2 = img.Select(i => (int)i).ToList()
+            };
+
+            var dto = config.Map<ForTest7DTO>(entity);
+
+            Assert.True(Enumerable.SequenceEqual(entity.Image1.Select(b => (int)b), dto.Image1));
+            Assert.True(Enumerable.SequenceEqual(entity.Image2, dto.Image2.Select(b => (int)b)));
+        }
     }
 }

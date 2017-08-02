@@ -25,11 +25,21 @@ namespace BatMap {
     }
 #endif
 
-            public static bool IsPrimitive(Type type) {
+        public static bool IsPrimitive(Type type) {
 #if NET_STANDARD
-            return type.GetTypeInfo().IsValueType || type == typeof(string);
+            var typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                type = type.GenericTypeArguments[0];
+                typeInfo = type.GetTypeInfo();
+            }
+
+            return !typeInfo.IsGenericType && (typeInfo.IsValueType || type == typeof(string));
 #else
-            return type.IsValueType || type == typeof(string);
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                type = type.GetGenericArguments()[0];
+            }
+
+            return !type.IsGenericType && (type.IsValueType || type == typeof(string));
 #endif
         }
 

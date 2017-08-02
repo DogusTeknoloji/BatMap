@@ -27,4 +27,9 @@ namespace BatMap.Tests.DTO {
     public class ForTest6DTO {
         public HashSet<CityDTO> Cities { get; set; }
     }
+
+    public class ForTest7DTO {
+        public int[] Image1 { get; set; }
+        public List<byte?> Image2 { get; set; }
+    }
 }
