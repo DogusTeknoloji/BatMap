@@ -63,6 +63,36 @@ namespace BatMap.Benchmark {
             var customerDTOs = _customers.Map<Customer, CustomerDTO>().ToList();
         }
 
+#if NET
+        [Benchmark]
+        public void HandWritten() {
+            var customerDTOs = _customers.Select(c => new CustomerDTO {
+                Id = c.Id,
+                Addresses = c.Addresses.ConvertAll(a => new AddressDTO {
+                    City = new CityDTO {
+                        Id = a.City.Id,
+                        Name = a.City.Name,
+                        Population = a.City.Population
+                    },
+                    Detail = a.Detail,
+                    Id = a.Id
+                }),
+                CompanyName = c.CompanyName,
+                Endorsement = c.Endorsement,
+                Orders = c.Orders.ConvertAll(o => new OrderDTO {
+                    Id = o.Id,
+                    OrderDetails = o.OrderDetails.ConvertAll(od => new OrderDetailDTO {
+                        Id = od.Id,
+                        Count = od.Count,
+                        UnitPrice = od.UnitPrice
+                    }),
+                    OrderNo = o.OrderNo,
+                    Price = o.Price
+                }),
+                Phone = c.Phone
+            }).ToList();
+        }
+#else
         [Benchmark]
         public void HandWritten() {
             var customerDTOs = _customers.Select(c => new CustomerDTO {
@@ -91,6 +121,7 @@ namespace BatMap.Benchmark {
                 Phone = c.Phone
             }).ToList();
         }
+#endif
 
         [Benchmark]
         public void Mapster() {
@@ -100,24 +131,24 @@ namespace BatMap.Benchmark {
 #if NET
         [Benchmark]
         public void SafeMapper() {
-            var customerDTOs = _customers.Select(c => global::SafeMapper.SafeMap.Convert<Customer, CustomerDTO>(c)).ToList();
+            var customerDTOs = global::SafeMapper.SafeMap.Convert<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 #endif
 
         [Benchmark]
         public void AutoMapper() {
-            var customerDTOs = _customers.Select(c => global::AutoMapper.Mapper.Map<CustomerDTO>(c)).ToList();
+            var customerDTOs = global::AutoMapper.Mapper.Map<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 
 #if NET
         [Benchmark]
         public void TinyMapper() {
-            var customerDTOs = _customers.Select(c => Nelibur.ObjectMapper.TinyMapper.Map<Customer, CustomerDTO>(c)).ToList();
+            var customerDTOs = Nelibur.ObjectMapper.TinyMapper.Map<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 
         [Benchmark]
         public void ExpressMapper() {
-            var customerDTOs = _customers.Select(c => global::ExpressMapper.Mapper.Map<Customer, CustomerDTO>(c)).ToList();
+            var customerDTOs = global::ExpressMapper.Mapper.Map<IList<Customer>, List<CustomerDTO>>(_customers);
         }
 
         [Benchmark]
