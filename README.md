@@ -17,7 +17,7 @@ Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkD
 
 |        Method |     Mean |
 |-------------- |---------:|
-|        BatMap :boom: | 2.000 ms :boom: |
+|        BatMap :boom: | 2.000 ms |
 |   HandWritten | 1.143 ms |
 |    SafeMapper | 2.933 ms |
 |       Mapster | 2.942 ms |
