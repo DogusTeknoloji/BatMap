@@ -22,9 +22,36 @@ namespace BatMap {
             _outMembers = Helper.GetMapFields(_outType, true).ToList();
         }
 
+        public MapBuilder<TIn, TOut> SkipMember(string memberName) {
+            var mapMember = _outMembers.FirstOrDefault(m => m.Name == memberName)
+                ?? throw new ArgumentException($"{memberName} member is not available for mapping.");
+
+            _expressions[mapMember] = null;
+            return this;
+        }
+
         public MapBuilder<TIn, TOut> SkipMember<TResult>(Expression<Func<TOut, TResult>> selector) {
             var mapMember = GetOutMapMember(selector);
             _expressions[mapMember] = null;
+            return this;
+        }
+
+        public MapBuilder<TIn, TOut> MapMember(string outMemberName, string inMemberPath) {
+            var mapMember = _outMembers.FirstOrDefault(m => m.Name == outMemberName)
+                ?? throw new ArgumentException($"{outMemberName} member is not available for mapping.");
+
+            var inPrm = Expression.Parameter(_inType);
+            var mapContextPrm = Expression.Parameter(typeof(MapContext));
+
+            var propertyPath = inMemberPath.Split('.');
+            MemberExpression assignerExp = Expression.PropertyOrField(inPrm, propertyPath[0]);
+            for (var i = 1; i < propertyPath.Length; i++) {
+                assignerExp = Expression.PropertyOrField(assignerExp, propertyPath[i]);
+            }
+
+            var assignerLambda = Expression.Lambda(assignerExp, inPrm, mapContextPrm);
+
+            _expressions[mapMember] = assignerLambda;
             return this;
         }
 
@@ -37,16 +64,16 @@ namespace BatMap {
         private MapMember GetOutMapMember<TResult>(Expression<Func<TOut, TResult>> selector) {
             var memberBinding = selector.Body as MemberExpression;
             if (memberBinding == null)
-                throw new InvalidOperationException("Expression must select a member.");
+                throw new ArgumentException("Expression must select a member.");
 
             var parameter = memberBinding.Expression as ParameterExpression;
             if (parameter == null)
-                throw new InvalidOperationException($"Selected member must be owned by {_outType.Name}.");
+                throw new ArgumentException($"Selected member must be owned by {_outType.Name}.");
 
             var memberName = memberBinding.Member.Name;
             var mapMember = _outMembers.FirstOrDefault(m => m.Name == memberName);
             if (mapMember == null)
-                throw new InvalidOperationException($"{memberName} member is not available for mapping.");
+                throw new ArgumentException($"{memberName} member is not available for mapping.");
 
             return mapMember;
         }
@@ -92,7 +119,9 @@ namespace BatMap {
     }
 
     public interface IMapBuilder<out TImplementor, TIn, TOut> where TImplementor : IMapBuilder<TImplementor, TIn, TOut> {
+        TImplementor SkipMember(string selector);
         TImplementor SkipMember<TResult>(Expression<Func<TOut, TResult>> selector);
+        TImplementor MapMember(string selector, string assigner);
         TImplementor MapMember<TResult>(Expression<Func<TOut, TResult>> selector, Expression<Func<TIn, MapContext, TResult>> assigner);
         Expression<Func<TIn, MapContext, TOut>> GetProjector();
     }

@@ -23,22 +23,50 @@ namespace BatMap.Tests {
 
         [Fact]
         public void Register_With_Non_Member_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentException>(() =>
                 new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.Addresses.Count > 0, (c, mc) => c.CompanyName.Length > 0))
             );
         }
 
         [Fact]
         public void Register_With_Not_Owned_Member_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentException>(() =>
                 new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.Address.Detail, (c, mc) => c.CompanyName))
             );
         }
 
         [Fact]
         public void Register_With_Invalid_Member_Throws_Exception() {
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentException>(() =>
                 new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember(c => c.OrderCount, (c, mc) => c.CompanyName.Length))
+            );
+        }
+
+        [Fact]
+        public void Register_Skip_Not_Owned_Member_String_Throws_Exception() {
+            Assert.Throws<ArgumentException>(() =>
+                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.SkipMember("OrderCount"))
+            );
+        }
+
+        [Fact]
+        public void Register_With_Not_Owned_Member_String_Throws_Exception() {
+            Assert.Throws<ArgumentException>(() =>
+                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember("OrderCount", "CompanyName"))
+            );
+        }
+
+        [Fact]
+        public void Register_From_Not_Owned_Member_String_Throws_Exception() {
+            Assert.Throws<ArgumentException>(() =>
+                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember("Endorsement", "Orders.TotalCount"))
+            );
+        }
+
+        [Fact]
+        public void Register_From_Not_Owned_Member_String_Throws_Exception_2() {
+            Assert.Throws<ArgumentException>(() =>
+                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember("Endorsement", "Totals.OrderCount"))
             );
         }
 

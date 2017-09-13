@@ -83,6 +83,19 @@ namespace BatMap.Tests {
         }
 
         [Fact]
+        public void Map_Orders_With_SkipMember_String() {
+            var config = new MapConfiguration();
+            config.RegisterMap<Order, OrderDTO>(b => {
+                b.SkipMember("Price");
+            });
+
+            var order = Give<Order>.Single();
+            var orderDto = config.Map<OrderDTO>(order);
+
+            Assert.NotEqual(order.Price, orderDto.Price);
+        }
+
+        [Fact]
         public void Map_Orders_With_MapMember() {
             var config = new MapConfiguration();
             config.RegisterMap<Order, OrderDTO>(b => {
@@ -93,6 +106,20 @@ namespace BatMap.Tests {
             var orderDto = config.Map<OrderDTO>(order);
 
             Assert.True(orderDto.Price.Equals(order.Price * 3));
+        }
+
+        [Fact]
+        public void Map_Orders_With_MapMember_String() {
+            var config = new MapConfiguration();
+            config.RegisterMap<OrderDTO, Order>();
+            config.RegisterMap<OrderDetailDTO, OrderDetail>(b => {
+                b.MapMember("OrderId", "Order.Id");
+            });
+
+            var orderDetailDto = Give<OrderDetailDTO>.ToMe().With(od => od.Order = Give<OrderDTO>.Single()).Now();
+            var orderDetail = config.Map<OrderDetail>(orderDetailDto);
+
+            Assert.True(orderDetail.OrderId.Equals(orderDetailDto.Order.Id));
         }
 
         [Fact]
