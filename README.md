@@ -15,16 +15,16 @@ Supports .Net Standard 1.0.
 
 Let's first obey the number one rule for mappers, a benchmark (using [BenchmarkDotNet](http://benchmarkdotnet.org/)):
 
-|        Method |      Mean |
-|-------------- |---------- |
-|        BatMap :boom:| 1.3309 ms :boom:|
-|       Mapster | 2.0377 ms |
-|    SafeMapper | 2.0371 ms |
-|   HandWritten | 2.1175 ms |
-|    AutoMapper | 2.6187 ms |
-|    TinyMapper | 2.8119 ms |
-| ExpressMapper | 5.0814 ms |
-|    FastMapper | 5.9380 ms |
+|        Method |     Mean |
+|-------------- |---------:|
+|        BatMap :boom: | 2.000 ms |
+|   HandWritten | 1.143 ms |
+|    SafeMapper | 2.933 ms |
+|       Mapster | 2.942 ms |
+|    AutoMapper | 3.497 ms |
+|    TinyMapper | 4.172 ms |
+| ExpressMapper | 6.955 ms |
+|    FastMapper | 9.203 ms |
 
 <sup>Results may (probably) vary. Latest run can bee seen on [Appveyor Build](https://ci.appveyor.com/project/DogusTeknoloji/batmap).</sup>
     
