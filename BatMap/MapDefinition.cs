@@ -8,7 +8,7 @@ namespace BatMap {
         private readonly Lazy<Func<TIn, MapContext, TOut>> _lazyMapperWithCache;
         private readonly Lazy<Func<TIn, TOut, MapContext, TOut>> _lazyPopulator;
 
-        internal MapDefinition(Expression<Func<TIn, MapContext, TOut>> projector) {
+        public MapDefinition(Expression<Func<TIn, MapContext, TOut>> projector) {
             InType = typeof(TIn);
             Projector = projector;
             Mapper = Helper.CreateMapper(projector);
