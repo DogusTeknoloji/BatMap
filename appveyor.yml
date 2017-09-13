@@ -4,7 +4,7 @@ image: Visual Studio 2017
 
 skip_commits:
   files:
-    - **/*.md
+    - '**/*.md'
     
 configuration: Release
 
