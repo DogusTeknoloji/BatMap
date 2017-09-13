@@ -2,6 +2,10 @@ version: 1.0.{build}
 
 image: Visual Studio 2017
 
+skip_commits:
+  files:
+    - **/*.md
+    
 configuration: Release
 
 assembly_info:

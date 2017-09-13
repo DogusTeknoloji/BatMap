@@ -37,8 +37,7 @@ namespace BatMap {
         }
 
         public bool GetFromCache<TOut>(object inObj, out TOut outObj) {
-            object o;
-            if (_referenceCache.TryGetValue(Helper.GenerateHashCode(inObj, inObj.GetType(), typeof(TOut)), out o)) {
+            if (_referenceCache.TryGetValue(Helper.GenerateHashCode(inObj, inObj.GetType(), typeof(TOut)), out object o)) {
                 outObj = (TOut)o;
                 return true;
             }
@@ -48,9 +47,7 @@ namespace BatMap {
         }
 
         public TOut Map<TIn, TOut>(TIn inObj) {
-            if (Equals(inObj, default(TIn))) return default(TOut);
-
-            return _mapper.Map<TIn, TOut>(inObj, this);
+            return Equals(inObj, default(TIn)) ? default(TOut) : _mapper.Map<TIn, TOut>(inObj, this);
         }
 
         public List<TOut> MapToList<TIn, TOut>(IEnumerable<TIn> source) {
@@ -60,41 +57,32 @@ namespace BatMap {
             var outType = typeof(TOut);
 
             List<TOut> retVal;
-            var sourceList = source as IList<TIn>;
-            if (sourceList != null) {
+            if (source is IList<TIn> sourceList) {
                 var count = sourceList.Count;
                 retVal = new List<TOut>(count);
                 if (count == 0) return retVal;
 
-                var mapDefinition = (IMapDefinition<TIn, TOut>) _mapper.GetMapDefinition(inType, outType);
+                var mapDefinition = (IMapDefinition<TIn, TOut>)_mapper.GetMapDefinition(inType, outType);
                 var mapper = PreserveReferences ? mapDefinition.MapperWithCache : mapDefinition.Mapper;
                 for (var i = 0; i < count; i++) {
                     retVal.Add(mapper(sourceList[i], this));
                 }
             }
             else {
-                retVal = new List<TOut>();
-
                 var mapDefinition = (IMapDefinition<TIn, TOut>)_mapper.GetMapDefinition(inType, outType);
                 var mapper = PreserveReferences ? mapDefinition.MapperWithCache : mapDefinition.Mapper;
-                foreach (var i in source) {
-                    retVal.Add(mapper(i, this));
-                }
+                retVal = source.Select(i => mapper(i, this)).ToList();
             }
 
             return retVal;
         }
 
         public Collection<TOut> MapToCollection<TIn, TOut>(IEnumerable<TIn> source) {
-            if (source == null) return null;
-
-            return new Collection<TOut>(MapToList<TIn, TOut>(source));
+            return source == null ? null : new Collection<TOut>(MapToList<TIn, TOut>(source));
         }
 
         public TOut[] MapToArray<TIn, TOut>(IEnumerable<TIn> source) {
-            if (source == null) return null;
-
-            return MapToList<TIn, TOut>(source).ToArray();
+            return source == null ? null : MapToList<TIn, TOut>(source).ToArray();
         }
 
         public TOutCollection MapToCollectionType<TIn, TOut, TOutCollection>(IEnumerable<TIn> source) {

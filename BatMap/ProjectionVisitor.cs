@@ -102,8 +102,7 @@ namespace BatMap {
 
             IEnumerable<IncludePath> childPaths = null;
             if (_includes != null) {
-                IncludePath subPath;
-                TryGetIncludePath(inPrm, out subPath);
+                TryGetIncludePath(inPrm, out IncludePath subPath);
                 childPaths = subPath?.Children ?? Enumerable.Empty<IncludePath>();
             }
 
@@ -116,8 +115,7 @@ namespace BatMap {
         }
 
         private bool CheckInclude(Expression member) {
-            IncludePath includePath;
-            return TryGetIncludePath(member, out includePath);
+            return TryGetIncludePath(member, out IncludePath _);
         }
 
         private bool TryGetIncludePath(Expression memberExp, out IncludePath includePath) {

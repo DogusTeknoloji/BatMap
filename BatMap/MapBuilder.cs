@@ -42,13 +42,6 @@ namespace BatMap {
         internal new Expression<Func<TIn, MapContext, TOut>> GetProjector() {
             return (Expression<Func<TIn, MapContext, TOut>>)base.GetProjector();
         }
-
-        private MemberBinding CreateMemberBinding(MapMember outMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
-            var inMember = InMembers.FirstOrDefault(p => p.Name == outMember.Name);
-            if (inMember == null) return null;
-
-            return ExpressionProvider.CreateMemberBinding(outMember, inMember, inObjPrm, mapContextPrm);
-        }
     }
 
     public sealed class MapBuilder : MapBuilderBase<MapBuilder> {
@@ -65,7 +58,7 @@ namespace BatMap {
         protected readonly IList<MapMember> InMembers;
         protected readonly IList<MapMember> OutMembers;
 
-        public MapBuilderBase(Type inType, Type outType, IExpressionProvider expressionProvider) {
+        protected MapBuilderBase(Type inType, Type outType, IExpressionProvider expressionProvider) {
             InType = inType;
             OutType = outType;
             ExpressionProvider = expressionProvider;
@@ -90,7 +83,7 @@ namespace BatMap {
             var mapContextPrm = Expression.Parameter(typeof(MapContext));
 
             var propertyPath = inMemberPath.Split('.');
-            MemberExpression assignerExp = Expression.PropertyOrField(inPrm, propertyPath[0]);
+            var assignerExp = Expression.PropertyOrField(inPrm, propertyPath[0]);
             for (var i = 1; i < propertyPath.Length; i++) {
                 assignerExp = Expression.PropertyOrField(assignerExp, propertyPath[i]);
             }
@@ -130,9 +123,7 @@ namespace BatMap {
 
         private MemberBinding CreateMemberBinding(MapMember outMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
             var inMember = InMembers.FirstOrDefault(p => p.Name == outMember.Name);
-            if (inMember == null) return null;
-
-            return ExpressionProvider.CreateMemberBinding(outMember, inMember, inObjPrm, mapContextPrm);
+            return inMember == null ? null : ExpressionProvider.CreateMemberBinding(outMember, inMember, inObjPrm, mapContextPrm);
         }
     }
 }

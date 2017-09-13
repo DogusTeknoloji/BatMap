@@ -71,7 +71,7 @@ namespace BatMap {
 
         public static IEnumerable<MapMember> GetMapFields(Type type, bool onlyWritable = false) {
 #if NET_STANDARD
-            IEnumerable<PropertyInfo> properties = type.GetRuntimeProperties()
+            var properties = type.GetRuntimeProperties()
                 .Where(p => p.GetMethod.IsPublic && !p.GetMethod.IsStatic);
             if (onlyWritable) {
                 properties = properties.Where(p => p.CanWrite && p.SetMethod.IsPublic);
@@ -96,26 +96,22 @@ namespace BatMap {
         public static List<string> GetMemberPath(Expression exp) {
             var retVal = new List<string>();
 
-            var callExp = exp as MethodCallExpression;
-            if (callExp != null && callExp.Method.DeclaringType == typeof(Enumerable) && callExp.Method.Name == "Select") {
+            if (exp is MethodCallExpression callExp && callExp.Method.DeclaringType == typeof(Enumerable) && callExp.Method.Name == "Select") {
                 retVal.AddRange(GetMemberPath(callExp.Arguments[0]));
                 retVal.AddRange(GetMemberPath(((LambdaExpression)callExp.Arguments[1]).Body));
                 return retVal;
             }
 
-            var memberExp = exp as MemberExpression;
-            if (memberExp != null) {
+            if (exp is MemberExpression memberExp) {
                 retVal.AddRange(GetMemberPath(memberExp.Expression));
                 retVal.Add(memberExp.Member.Name);
                 return retVal;
             }
 
-            var unaryExp = exp as UnaryExpression;
-            if (unaryExp != null)
+            if (exp is UnaryExpression unaryExp)
                 return GetMemberPath(unaryExp.Operand);
 
-            var lambdaExp = exp as LambdaExpression;
-            if (lambdaExp != null)
+            if (exp is LambdaExpression lambdaExp)
                 return GetMemberPath(lambdaExp.Body);
 
             return retVal;

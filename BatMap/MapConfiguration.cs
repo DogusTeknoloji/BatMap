@@ -2,27 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+#if NET_STANDARD
 using System.Reflection;
+#endif
 
 namespace BatMap {
 
     public class MapConfiguration {
-        private static readonly MethodInfo _generateMapDefinitionMethod;
         private readonly Dictionary<int, IMapDefinition> _mapDefinitions = new Dictionary<int, IMapDefinition>();
         private readonly IExpressionProvider _expressionProvider;
         private readonly DynamicMapping _dynamicMapping;
         private readonly bool _preserveReferences;
-
-        static MapConfiguration() {
-#if NET_STANDARD
-            var methods = typeof(MapConfiguration).GetRuntimeMethods().ToList();
-#else
-            var methods = typeof(MapConfiguration).GetMethods().ToList();
-#endif
-
-            _generateMapDefinitionMethod = methods
-                    .First(mi => mi.Name == "GenerateMapDefinition" && mi.IsGenericMethod);
-        }
 
         public MapConfiguration(DynamicMapping dynamicMapping = DynamicMapping.NotAllowed, 
                                 bool preserveReferences = false) 
@@ -67,16 +57,15 @@ namespace BatMap {
         }
 
         internal IMapDefinition GetMapDefinition(Type inType, Type outType) {
-            IMapDefinition mapDefinition;
             var pairKey = Helper.GenerateHashCode(inType, outType);
-            if (!_mapDefinitions.TryGetValue(pairKey, out mapDefinition)) {
-                if (_dynamicMapping == DynamicMapping.NotAllowed)
-                    throw new InvalidOperationException($"Cannot find map definition between {inType.Name} and {outType.Name}.");
+            if (_mapDefinitions.TryGetValue(pairKey, out IMapDefinition mapDefinition)) return mapDefinition;
 
-                mapDefinition = GenerateMapDefinition(inType, outType);
-                if (_dynamicMapping == DynamicMapping.MapAndCache) {
-                    _mapDefinitions[pairKey] = mapDefinition;
-                }
+            if (_dynamicMapping == DynamicMapping.NotAllowed)
+                throw new InvalidOperationException($"Cannot find map definition between {inType.Name} and {outType.Name}.");
+
+            mapDefinition = GenerateMapDefinition(inType, outType);
+            if (_dynamicMapping == DynamicMapping.MapAndCache) {
+                _mapDefinitions[pairKey] = mapDefinition;
             }
 
             return mapDefinition;
