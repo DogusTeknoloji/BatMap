@@ -11,7 +11,7 @@ namespace BatMap {
 
         #region Register
 
-        public static IMapDefinition RegisterMap(Type inType, Type outType) {
+        public static IMapDefinition RegisterMap(Type inType, Type outType, Action<MapBuilder> buildAction = null) {
             return DefaultConfig.RegisterMap(inType, outType);
         }
 

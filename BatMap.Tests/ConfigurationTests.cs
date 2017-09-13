@@ -45,39 +45,29 @@ namespace BatMap.Tests {
         [Fact]
         public void Register_Skip_Not_Owned_Member_String_Throws_Exception() {
             Assert.Throws<ArgumentException>(() =>
-                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.SkipMember("OrderCount"))
+                new MapConfiguration().RegisterMap(typeof(Customer), typeof(CustomerDTO), b => b.SkipMember("OrderCount"))
             );
         }
 
         [Fact]
         public void Register_With_Not_Owned_Member_String_Throws_Exception() {
             Assert.Throws<ArgumentException>(() =>
-                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember("OrderCount", "CompanyName"))
+                new MapConfiguration().RegisterMap(typeof(Customer), typeof(CustomerDTO), b => b.MapMember("OrderCount", "CompanyName"))
             );
         }
 
         [Fact]
         public void Register_From_Not_Owned_Member_String_Throws_Exception() {
             Assert.Throws<ArgumentException>(() =>
-                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember("Endorsement", "Orders.TotalCount"))
+                new MapConfiguration().RegisterMap(typeof(Customer), typeof(CustomerDTO), b => b.MapMember("Endorsement", "Orders.TotalCount"))
             );
         }
 
         [Fact]
         public void Register_From_Not_Owned_Member_String_Throws_Exception_2() {
             Assert.Throws<ArgumentException>(() =>
-                new MapConfiguration().RegisterMap<Customer, CustomerDTO>(b => b.MapMember("Endorsement", "Totals.OrderCount"))
+                new MapConfiguration().RegisterMap(typeof(Customer), typeof(CustomerDTO), b => b.MapMember("Endorsement", "Totals.OrderCount"))
             );
-        }
-
-        [Fact]
-        public void Register_Can_Access_Projector_Via_Interface() {
-            var config = new MapConfiguration();
-            config.RegisterMap<Customer, CustomerDTO>(b => {
-                var builder = b as IMapBuilder<MapBuilder<Customer, CustomerDTO>, Customer, CustomerDTO>;
-                Assert.NotNull(builder);
-                Assert.NotNull(builder.GetProjector());
-            });
         }
 
         [Fact]

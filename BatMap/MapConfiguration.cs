@@ -7,7 +7,6 @@ using System.Reflection;
 namespace BatMap {
 
     public class MapConfiguration {
-        private static readonly MethodInfo _registerMapMethod;
         private static readonly MethodInfo _generateMapDefinitionMethod;
         private readonly Dictionary<int, IMapDefinition> _mapDefinitions = new Dictionary<int, IMapDefinition>();
         private readonly IExpressionProvider _expressionProvider;
@@ -21,9 +20,6 @@ namespace BatMap {
             var methods = typeof(MapConfiguration).GetMethods().ToList();
 #endif
 
-            _registerMapMethod = methods
-                .First(mi => mi.Name == "RegisterMap" && mi.IsGenericMethod
-                            && mi.GetParameters().First().ParameterType.GetGenericTypeDefinition() == typeof(Action<>));
             _generateMapDefinitionMethod = methods
                     .First(mi => mi.Name == "GenerateMapDefinition" && mi.IsGenericMethod);
         }
@@ -43,8 +39,8 @@ namespace BatMap {
 
 #region Register
 
-        public IMapDefinition RegisterMap(Type inType, Type outType) {
-            return (IMapDefinition)_registerMapMethod.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
+        public IMapDefinition RegisterMap(Type inType, Type outType, Action<MapBuilder> buildAction = null) {
+            return RegisterMapImpl(inType, outType, GenerateMapDefinition(inType, outType, buildAction));
         }
 
         public IMapDefinition<TIn, TOut> RegisterMap<TIn, TOut>(Action<MapBuilder<TIn, TOut>> buildAction = null) {
@@ -56,7 +52,12 @@ namespace BatMap {
         }
 
         private IMapDefinition<TIn, TOut> RegisterMapImpl<TIn, TOut>(IMapDefinition<TIn, TOut> mapDefinition) {
-            _mapDefinitions[Helper.GenerateHashCode(typeof(TIn), typeof(TOut))] = mapDefinition;
+            RegisterMapImpl(typeof(TIn), typeof(TOut), mapDefinition);
+            return mapDefinition;
+        }
+
+        private IMapDefinition RegisterMapImpl(Type inType, Type outType, IMapDefinition mapDefinition) {
+            _mapDefinitions[Helper.GenerateHashCode(inType, outType)] = mapDefinition;
 
             return mapDefinition;
         }
@@ -81,8 +82,16 @@ namespace BatMap {
             return mapDefinition;
         }
 
-        private IMapDefinition GenerateMapDefinition(Type inType, Type outType) {
-            return (IMapDefinition)_generateMapDefinitionMethod.MakeGenericMethod(inType, outType).Invoke(this, new object[] { null });
+        public IMapDefinition GenerateMapDefinition(Type inType, Type outType, Action<MapBuilder> buildAction = null) {
+            var builder = new MapBuilder(inType, outType, _expressionProvider);
+            buildAction?.Invoke(builder);
+            var definitionType = typeof(MapDefinition<,>).MakeGenericType(inType, outType);
+#if NET_STANDARD
+            var ctor = definitionType.GetTypeInfo().DeclaredConstructors.First();
+#else
+            var ctor = definitionType.GetConstructors().First();
+#endif
+            return (IMapDefinition)ctor.Invoke(new object[] { builder.GetProjector() });
         }
 
         public IMapDefinition<TIn, TOut> GenerateMapDefinition<TIn, TOut>(Action<MapBuilder<TIn, TOut>> buildAction = null) {

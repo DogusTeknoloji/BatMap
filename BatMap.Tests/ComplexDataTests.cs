@@ -85,7 +85,7 @@ namespace BatMap.Tests {
         [Fact]
         public void Map_Orders_With_SkipMember_String() {
             var config = new MapConfiguration();
-            config.RegisterMap<Order, OrderDTO>(b => {
+            config.RegisterMap(typeof(Order), typeof(OrderDTO), b => {
                 b.SkipMember("Price");
             });
 
@@ -112,7 +112,7 @@ namespace BatMap.Tests {
         public void Map_Orders_With_MapMember_String() {
             var config = new MapConfiguration();
             config.RegisterMap<OrderDTO, Order>();
-            config.RegisterMap<OrderDetailDTO, OrderDetail>(b => {
+            config.RegisterMap(typeof(OrderDetailDTO), typeof(OrderDetail), b => {
                 b.MapMember("OrderId", "Order.Id");
             });
 

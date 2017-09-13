@@ -5,59 +5,20 @@ using System.Linq.Expressions;
 
 namespace BatMap {
 
-    public sealed class MapBuilder<TIn, TOut> : IMapBuilder<MapBuilder<TIn, TOut>, TIn, TOut> {
-        private readonly Dictionary<MapMember, LambdaExpression> _expressions = new Dictionary<MapMember, LambdaExpression>();
-        private readonly IExpressionProvider _expressionProvider;
-        private readonly Type _inType;
-        private readonly Type _outType;
-        private readonly IList<MapMember> _inMembers;
-        private readonly IList<MapMember> _outMembers;
+    public sealed class MapBuilder<TIn, TOut> : MapBuilderBase<MapBuilder<TIn, TOut>> {
 
-        public MapBuilder(IExpressionProvider expressionProvider) {
-            _expressionProvider = expressionProvider;
-
-            _inType = typeof(TIn);
-            _outType = typeof(TOut);
-            _inMembers = Helper.GetMapFields(_inType).ToList();
-            _outMembers = Helper.GetMapFields(_outType, true).ToList();
-        }
-
-        public MapBuilder<TIn, TOut> SkipMember(string memberName) {
-            var mapMember = _outMembers.FirstOrDefault(m => m.Name == memberName)
-                ?? throw new ArgumentException($"{memberName} member is not available for mapping.");
-
-            _expressions[mapMember] = null;
-            return this;
+        public MapBuilder(IExpressionProvider expressionProvider) : base(typeof(TIn), typeof(TOut), expressionProvider) {
         }
 
         public MapBuilder<TIn, TOut> SkipMember<TResult>(Expression<Func<TOut, TResult>> selector) {
             var mapMember = GetOutMapMember(selector);
-            _expressions[mapMember] = null;
-            return this;
-        }
-
-        public MapBuilder<TIn, TOut> MapMember(string outMemberName, string inMemberPath) {
-            var mapMember = _outMembers.FirstOrDefault(m => m.Name == outMemberName)
-                ?? throw new ArgumentException($"{outMemberName} member is not available for mapping.");
-
-            var inPrm = Expression.Parameter(_inType);
-            var mapContextPrm = Expression.Parameter(typeof(MapContext));
-
-            var propertyPath = inMemberPath.Split('.');
-            MemberExpression assignerExp = Expression.PropertyOrField(inPrm, propertyPath[0]);
-            for (var i = 1; i < propertyPath.Length; i++) {
-                assignerExp = Expression.PropertyOrField(assignerExp, propertyPath[i]);
-            }
-
-            var assignerLambda = Expression.Lambda(assignerExp, inPrm, mapContextPrm);
-
-            _expressions[mapMember] = assignerLambda;
+            Expressions[mapMember] = null;
             return this;
         }
 
         public MapBuilder<TIn, TOut> MapMember<TResult>(Expression<Func<TOut, TResult>> selector, Expression<Func<TIn, MapContext, TResult>> assigner) {
             var mapMember = GetOutMapMember(selector);
-            _expressions[mapMember] = assigner;
+            Expressions[mapMember] = assigner;
             return this;
         }
 
@@ -68,28 +29,85 @@ namespace BatMap {
 
             var parameter = memberBinding.Expression as ParameterExpression;
             if (parameter == null)
-                throw new ArgumentException($"Selected member must be owned by {_outType.Name}.");
+                throw new ArgumentException($"Selected member must be owned by {OutType.Name}.");
 
             var memberName = memberBinding.Member.Name;
-            var mapMember = _outMembers.FirstOrDefault(m => m.Name == memberName);
+            var mapMember = OutMembers.FirstOrDefault(m => m.Name == memberName);
             if (mapMember == null)
                 throw new ArgumentException($"{memberName} member is not available for mapping.");
 
             return mapMember;
         }
 
-        Expression<Func<TIn, MapContext, TOut>> IMapBuilder<MapBuilder<TIn, TOut>, TIn, TOut>.GetProjector() {
-            return GetProjector();
+        internal new Expression<Func<TIn, MapContext, TOut>> GetProjector() {
+            return (Expression<Func<TIn, MapContext, TOut>>)base.GetProjector();
         }
 
-        internal Expression<Func<TIn, MapContext, TOut>> GetProjector() {
-            var inObjPrm = Expression.Parameter(_inType);
+        private MemberBinding CreateMemberBinding(MapMember outMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
+            var inMember = InMembers.FirstOrDefault(p => p.Name == outMember.Name);
+            if (inMember == null) return null;
+
+            return ExpressionProvider.CreateMemberBinding(outMember, inMember, inObjPrm, mapContextPrm);
+        }
+    }
+
+    public sealed class MapBuilder : MapBuilderBase<MapBuilder> {
+
+        public MapBuilder(Type inType, Type outType, IExpressionProvider expressionProvider) : base(inType, outType, expressionProvider) {
+        }
+    }
+
+    public abstract class MapBuilderBase<TImplementor> where TImplementor: MapBuilderBase<TImplementor> {
+        protected readonly Dictionary<MapMember, LambdaExpression> Expressions = new Dictionary<MapMember, LambdaExpression>();
+        protected readonly IExpressionProvider ExpressionProvider;
+        protected readonly Type InType;
+        protected readonly Type OutType;
+        protected readonly IList<MapMember> InMembers;
+        protected readonly IList<MapMember> OutMembers;
+
+        public MapBuilderBase(Type inType, Type outType, IExpressionProvider expressionProvider) {
+            InType = inType;
+            OutType = outType;
+            ExpressionProvider = expressionProvider;
+
+            InMembers = Helper.GetMapFields(InType).ToList();
+            OutMembers = Helper.GetMapFields(OutType, true).ToList();
+        }
+
+        public TImplementor SkipMember(string memberName) {
+            var mapMember = OutMembers.FirstOrDefault(m => m.Name == memberName)
+                ?? throw new ArgumentException($"{memberName} member is not available for mapping.");
+
+            Expressions[mapMember] = null;
+            return (TImplementor)this;
+        }
+
+        public TImplementor MapMember(string outMemberName, string inMemberPath) {
+            var mapMember = OutMembers.FirstOrDefault(m => m.Name == outMemberName)
+                ?? throw new ArgumentException($"{outMemberName} member is not available for mapping.");
+
+            var inPrm = Expression.Parameter(InType);
+            var mapContextPrm = Expression.Parameter(typeof(MapContext));
+
+            var propertyPath = inMemberPath.Split('.');
+            MemberExpression assignerExp = Expression.PropertyOrField(inPrm, propertyPath[0]);
+            for (var i = 1; i < propertyPath.Length; i++) {
+                assignerExp = Expression.PropertyOrField(assignerExp, propertyPath[i]);
+            }
+
+            var assignerLambda = Expression.Lambda(assignerExp, inPrm, mapContextPrm);
+
+            Expressions[mapMember] = assignerLambda;
+            return (TImplementor)this;
+        }
+
+        protected internal LambdaExpression GetProjector() {
+            var inObjPrm = Expression.Parameter(InType);
             var mapContextPrm = Expression.Parameter(typeof(MapContext));
 
             var memberBindings = new List<MemberBinding>();
-            foreach (var outMember in _outMembers) {
-                LambdaExpression expression;
-                if (_expressions.TryGetValue(outMember, out expression)) {
+            foreach (var outMember in OutMembers) {
+                if (Expressions.TryGetValue(outMember, out LambdaExpression expression)) {
                     if (expression == null) continue;
 
                     var prv = new ParameterReplaceVisitor(new Dictionary<ParameterExpression, Expression> {
@@ -106,23 +124,15 @@ namespace BatMap {
                 }
             }
 
-            var memberInit = Expression.MemberInit(Expression.New(_outType), memberBindings);
-            return Expression.Lambda<Func<TIn, MapContext, TOut>>(memberInit, inObjPrm, mapContextPrm);
+            var memberInit = Expression.MemberInit(Expression.New(OutType), memberBindings);
+            return Expression.Lambda(memberInit, inObjPrm, mapContextPrm);
         }
 
         private MemberBinding CreateMemberBinding(MapMember outMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
-            var inMember = _inMembers.FirstOrDefault(p => p.Name == outMember.Name);
+            var inMember = InMembers.FirstOrDefault(p => p.Name == outMember.Name);
             if (inMember == null) return null;
 
-            return _expressionProvider.CreateMemberBinding(outMember, inMember, inObjPrm, mapContextPrm);
+            return ExpressionProvider.CreateMemberBinding(outMember, inMember, inObjPrm, mapContextPrm);
         }
-    }
-
-    public interface IMapBuilder<out TImplementor, TIn, TOut> where TImplementor : IMapBuilder<TImplementor, TIn, TOut> {
-        TImplementor SkipMember(string selector);
-        TImplementor SkipMember<TResult>(Expression<Func<TOut, TResult>> selector);
-        TImplementor MapMember(string selector, string assigner);
-        TImplementor MapMember<TResult>(Expression<Func<TOut, TResult>> selector, Expression<Func<TIn, MapContext, TResult>> assigner);
-        Expression<Func<TIn, MapContext, TOut>> GetProjector();
     }
 }
