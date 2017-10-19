@@ -6,6 +6,7 @@ using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
 using Xunit;
 using Giver;
+using System.Collections;
 
 namespace BatMap.Tests {
 
@@ -215,6 +216,13 @@ namespace BatMap.Tests {
 
             Assert.True(dtos[3].Cities.First().Name == entities[3].Cities.First().Name);
             Assert.Null(dtos[4].Cities);
+        }
+
+        [Fact]
+        public void Map_Null_Returns_Null() {
+            var config = new MapConfiguration();
+
+            Assert.Null(config.Map((object)null));
         }
 
         [Fact]
