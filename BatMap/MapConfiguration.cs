@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -118,9 +119,14 @@ namespace BatMap {
         }
 
         public object Map(object inObj, bool? preserveReferences = null) {
+            if (inObj is IEnumerable<object> e) return Map(e, preserveReferences);
+            
+            return Map(inObj, new MapContext(this, preserveReferences ?? _preserveReferences));
+        }
+
+        internal object Map(object inObj, MapContext mapContext) {
             if (inObj == null) return null;
 
-            var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
             var inType = inObj.GetType();
             var kvpMap = _mapDefinitions.FirstOrDefault(kvp => kvp.Value.InType == inType);
             if (!Equals(kvpMap, default(KeyValuePair<int, IMapDefinition>))) return Map(inObj, mapContext, kvpMap.Value);
@@ -144,7 +150,20 @@ namespace BatMap {
             return mapper.DynamicInvoke(inObj, mapContext);
         }
 
-        public IEnumerable<TOut> Map<TIn, TOut>(IEnumerable<TIn> source, bool? preserveReferences = null) {
+        public List<object> Map(IEnumerable<object> source, bool? preserveReferences = null) {
+            if (source == null) return null;
+            
+            var retVal = new List<object>();
+            var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);
+
+            foreach(var inObj in source) {
+                retVal.Add(Map(inObj, mapContext));
+            }
+
+            return retVal;
+        }
+
+        public List<TOut> Map<TIn, TOut>(IEnumerable<TIn> source, bool? preserveReferences = null) {
             if (source == null) return null;
 
             var mapContext = new MapContext(this, preserveReferences ?? _preserveReferences);

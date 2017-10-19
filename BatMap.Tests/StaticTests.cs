@@ -110,6 +110,22 @@ namespace BatMap.Tests {
         }
 
         [Fact]
+        public void Map_Enumerable_Object() {
+            var dtos = Mapper.Map(Customers);
+
+            Assert.Equal(dtos.Count(), Customers.Count);
+        }
+
+        [Fact]
+        public void Map_Enumerable_AutoDetect() {
+            object customers = Customers;
+            var dtos = (IEnumerable<object>)Mapper.Map(customers);
+
+            Assert.Equal(dtos.Count(), Customers.Count);
+        }
+
+
+        [Fact]
         public void Map_Dictionary() {
             var dict = Customers.ToDictionary(c => c.Id, c => c);
             var dtoDict = Mapper.Map<int, Customer, int, CustomerDTO>(dict);

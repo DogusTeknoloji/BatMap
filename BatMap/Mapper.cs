@@ -47,7 +47,11 @@ namespace BatMap {
             return DefaultConfig.Map(inObj, outType, preserveReferences);
         }
 
-        public static IEnumerable<TOut> Map<TIn, TOut>(this IEnumerable<TIn> source, bool? preserveReferences = null) {
+        public static List<object> Map(IEnumerable<object> source, bool? preserveReferences = null) {
+            return DefaultConfig.Map(source, preserveReferences);
+        }
+
+        public static List<TOut> Map<TIn, TOut>(this IEnumerable<TIn> source, bool? preserveReferences = null) {
             return DefaultConfig.Map<TIn, TOut>(source, preserveReferences);
         }
 

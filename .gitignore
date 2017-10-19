@@ -257,3 +257,5 @@ paket-files/
 /BatMap.Benchmark/BenchmarkDotNet.Artifacts/results
 /tools
 /results.xml
+
+.DS_Store

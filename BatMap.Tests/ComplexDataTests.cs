@@ -34,7 +34,7 @@ namespace BatMap.Tests {
         public void Map_Orders() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
-            var dtoList = config.Map<Order, OrderDTO>(_orders).ToList();
+            var dtoList = config.Map<Order, OrderDTO>(_orders);
 
             Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].Product.Supplier.CompanyName,
@@ -46,11 +46,38 @@ namespace BatMap.Tests {
         public void Map_Orders_PreserveReferences() {
             var config = new MapConfiguration(DynamicMapping.MapAndCache);
 
-            var dtoList = config.Map<Order, OrderDTO>(_orders, true).ToList();
+            var dtoList = config.Map<Order, OrderDTO>(_orders, true);
 
             Assert.Equal(
                 dtoList[5].OrderDetails.ToList()[1].Product,
                 dtoList[7].OrderDetails.ToList()[1].Product
+            );
+        }
+
+        [Fact]
+        public void Map_Orders_PreserveReferences_Enumerable() {
+            var config = new MapConfiguration(DynamicMapping.MapAndCache);
+            config.RegisterMap<Order, OrderDTO>();
+
+            var dtoList = config.Map(_orders, true);
+
+            Assert.Equal(
+                ((OrderDTO)dtoList[5]).OrderDetails.ToList()[1].Product,
+                ((OrderDTO)dtoList[7]).OrderDetails.ToList()[1].Product
+            );
+        }
+
+        [Fact]
+        public void Map_Orders_PreserveReferences_Enumerable_AutoDetect() {
+            var config = new MapConfiguration(DynamicMapping.MapAndCache);
+            config.RegisterMap<Order, OrderDTO>();
+
+            var orders = (object)_orders;
+            var dtoList = ((List<object>)config.Map(orders, true)).Cast<OrderDTO>().ToList();
+
+            Assert.Equal(
+                ((OrderDTO)dtoList[5]).OrderDetails.ToList()[1].Product,
+                ((OrderDTO)dtoList[7]).OrderDetails.ToList()[1].Product
             );
         }
 
@@ -138,7 +165,7 @@ namespace BatMap.Tests {
             config.RegisterMap<Product, ProductDTO>();
             config.RegisterMap<Company, CompanyDTO>();
 
-            var dtoList = config.Map<Order, OrderDTO>(_orders).ToList();
+            var dtoList = config.Map<Order, OrderDTO>(_orders);
 
             Assert.Equal(
                 dtoList[3].OrderDetails.ToList()[2].SubPrice,
