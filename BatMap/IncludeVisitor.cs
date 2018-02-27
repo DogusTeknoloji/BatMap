@@ -6,6 +6,7 @@ namespace BatMap {
 
     internal sealed class IncludeVisitor : ExpressionVisitor {
         private readonly List<IEnumerable<string>> _includes = new List<IEnumerable<string>>();
+        private IEnumerable<string> _thenIncludes;
 
         internal IEnumerable<IncludePath> GetIncludes(IQueryable query) {
             _includes.Clear();
@@ -26,8 +27,22 @@ namespace BatMap {
                 }
             }
             else if (m.Method.Name == "Include") {
-                var memberExp = m.Arguments[1];
-                _includes.Add(Helper.GetMemberPath(memberExp));
+                var path = Helper.GetMemberPath(m.Arguments[1]);
+                if (_thenIncludes != null) {
+                    path.AddRange(_thenIncludes);
+                    _thenIncludes = null;
+                }
+
+                _includes.Add(path);
+            }
+            if (m.Method.Name == "ThenInclude") {
+                var path = Helper.GetMemberPath(m.Arguments[1]);
+                if (_thenIncludes == null) {
+                    _thenIncludes = path;
+                }
+                else {
+                    _thenIncludes = path.Concat(_thenIncludes);
+                }
             }
 
             return base.VisitMethodCall(m);
