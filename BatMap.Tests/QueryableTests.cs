@@ -37,7 +37,11 @@ namespace BatMap.Tests {
             var context = TestEntities.Create();
             var q = context.Orders
                 .Include(o => o.OrderDetails.Select(od => od.Product.Supplier.Addresses.Select(a => a.City)))
+#if NET_CORE
+                .Include(o => o.OrderDetails).ThenInclude(od => od.Select(x => x.Product)).ThenInclude(p => p.Supplier).ThenInclude(c => c.MainAddress);
+#else
                 .Include(o => o.OrderDetails.Select(od => od.Product.Supplier.MainAddress));
+#endif
 
             var oIncludes = Helper.GetIncludes(q).FirstOrDefault();
             Assert.True(oIncludes != null && oIncludes.Member == "OrderDetails");
