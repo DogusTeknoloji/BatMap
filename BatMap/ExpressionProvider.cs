@@ -16,6 +16,7 @@ namespace BatMap {
         protected static readonly MethodInfo SelectMethod;
         protected static readonly MethodInfo ToListMethod;
         protected static readonly MethodInfo ToArrayMethod;
+        protected static readonly MethodInfo ChangeTypeMethod;
 
         static ExpressionProvider() {
 #if NET_STANDARD
@@ -34,11 +35,23 @@ namespace BatMap {
                 .First(m => m.Name == "Select" && m.GetParameters().Last().ParameterType.GenericTypeArguments.Length == 2);
             ToListMethod = typeof(Enumerable).GetRuntimeMethods().First(m => m.Name == "ToList");
             ToArrayMethod = typeof(Enumerable).GetRuntimeMethods().First(m => m.Name == "ToArray");
+            ChangeTypeMethod = typeof(Convert).GetRuntimeMethods().First(m => {
+                if (m.Name != "ChangeType") return false;
+
+                var prms = m.GetParameters();
+                return prms.Length == 2 && prms[1].ParameterType == typeof(Type);
+            });
 #else
             SelectMethod = typeof(Enumerable).GetMethods()
                 .First(m => m.Name == "Select" && m.GetParameters().Last().ParameterType.GetGenericArguments().Length == 2);
             ToListMethod = typeof(Enumerable).GetMethod("ToList");
             ToArrayMethod = typeof(Enumerable).GetMethod("ToArray");
+            ChangeTypeMethod = typeof(Convert).GetMethods().First(m => {
+                if (m.Name != "ChangeType") return false;
+
+                var prms = m.GetParameters();
+                return prms.Length == 2 && prms[1].ParameterType == typeof(Type);
+            });
 #endif
         }
 
@@ -47,8 +60,11 @@ namespace BatMap {
         public virtual MemberBinding CreateMemberBinding(MapMember outMember, MapMember inMember, ParameterExpression inObjPrm, ParameterExpression mapContextPrm) {
             if (inMember.IsPrimitive) {
                 Expression member = Expression.PropertyOrField(inObjPrm, inMember.Name);
-                if (inMember.Type != outMember.Type)
+                if (inMember.Type != outMember.Type) {
+                    member = Expression.MakeUnary(ExpressionType.Convert, member, typeof(object));
+                    member = Expression.Call(ChangeTypeMethod, member, Expression.Constant(outMember.Type));
                     member = Expression.MakeUnary(ExpressionType.Convert, member, outMember.Type);
+                }
 
                 return Expression.Bind(outMember.MemberInfo, member);
             }

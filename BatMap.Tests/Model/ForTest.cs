@@ -9,7 +9,7 @@ namespace BatMap.Tests.Model {
     }
 
     public class ForTest2 {
-        public int? Number { get; set; }
+        public string Number { get; set; }
     }
 
     public class ForTest3 {
