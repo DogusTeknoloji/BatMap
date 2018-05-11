@@ -61,9 +61,14 @@ namespace BatMap {
             if (inMember.IsPrimitive) {
                 Expression member = Expression.PropertyOrField(inObjPrm, inMember.Name);
                 if (inMember.Type != outMember.Type) {
-                    member = Expression.MakeUnary(ExpressionType.Convert, member, typeof(object));
-                    member = Expression.Call(ChangeTypeMethod, member, Expression.Constant(outMember.Type));
-                    member = Expression.MakeUnary(ExpressionType.Convert, member, outMember.Type);
+                    if (Helper.TypesCastable(inMember.Type, outMember.Type)) {
+                        member = Expression.MakeUnary(ExpressionType.Convert, member, outMember.Type);
+                    }
+                    else {
+                        member = Expression.MakeUnary(ExpressionType.Convert, member, typeof(object));
+                        member = Expression.Call(ChangeTypeMethod, member, Expression.Constant(outMember.Type));
+                        member = Expression.MakeUnary(ExpressionType.Convert, member, outMember.Type);
+                    }
                 }
 
                 return Expression.Bind(outMember.MemberInfo, member);

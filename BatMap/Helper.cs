@@ -43,6 +43,30 @@ namespace BatMap {
 #endif
         }
 
+        public static bool TypesCastable(Type from, Type to) {
+#if NET_STANDARD
+            var fromTypeInfo = from.GetTypeInfo();
+            var toTypeInfo = to.GetTypeInfo();
+            if (toTypeInfo.IsAssignableFrom(fromTypeInfo)) return true;
+
+            return from.GetRuntimeMethods()
+                .Any(m => 
+                    m.IsStatic &&
+                    m.IsPublic &&
+                    m.ReturnType == to &&
+                    (m.Name == "op_Implicit" || m.Name == "op_Explicit")
+                );
+#else
+            if (to.IsAssignableFrom(from)) return true;
+
+            return from.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Any(m => 
+                    m.ReturnType == to &&
+                    (m.Name == "op_Implicit" || m.Name == "op_Explicit")
+                );
+#endif
+        }
+
         public static object GetPropertyValue(object obj, string propName) {
 #if NET_STANDARD
             var propertyInfo = obj.GetType()

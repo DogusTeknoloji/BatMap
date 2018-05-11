@@ -10,6 +10,7 @@ namespace BatMap.Tests.DTO {
 
     public class ForTest2DTO {
         public int Number { get; set; }
+        public int? Number2 { get; set; }
     }
 
     public class ForTest3DTO {
