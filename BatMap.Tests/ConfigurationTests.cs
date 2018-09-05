@@ -82,21 +82,6 @@ namespace BatMap.Tests {
         }
 
         [Fact]
-        public void Register_With_Type_Cast() {
-            var config = new MapConfiguration();
-            config.RegisterMap<ForTest2, ForTest2DTO>();
-            config.RegisterMap<ForTest2DTO, ForTest2>();
-
-            var dto = config.Map<ForTest2DTO>(new ForTest2 { Number = "5", Number2 = 5 });
-            Assert.Equal(dto.Number, 5);
-            Assert.Equal(dto.Number2, 5);
-
-            var model = config.Map<ForTest2>(new ForTest2DTO { Number = 5, Number2 = 5 });
-            Assert.Equal(model.Number, "5");
-            Assert.Equal(model.Number2, 5);
-        }
-
-        [Fact]
         public void Map_With_Non_MemberInitExpression() {
             var config = new MapConfiguration();
             config.RegisterMap<Customer, CustomerDTO>((c, mc) => null);
