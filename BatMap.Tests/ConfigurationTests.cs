@@ -6,7 +6,6 @@ using BatMap.Tests.DTO;
 using BatMap.Tests.Model;
 using Xunit;
 using Giver;
-using System.Collections;
 
 namespace BatMap.Tests {
 
@@ -114,7 +113,7 @@ namespace BatMap.Tests {
             var customers = Give<Customer>.Many(5);
             var dtos = config.Map<Customer, CustomerDTO>(customers);
 
-            Assert.Equal(dtos.Count(), 5);
+            Assert.Equal(dtos.Count, 5);
         }
 
         [Fact]
@@ -308,7 +307,7 @@ namespace BatMap.Tests {
             config.RegisterMap<ForTest7, ForTest7DTO>();
 
             var rnd = new Random();
-            var img = Enumerable.Range(0, 100).Select(i => (byte)rnd.Next(255));
+            var img = Enumerable.Range(0, 100).Select(i => (byte)rnd.Next(255)).ToList();
             var entity = new ForTest7 {
                 Image1 = img.ToArray(),
                 Image2 = img.Select(i => (int)i).ToList(),
@@ -317,9 +316,21 @@ namespace BatMap.Tests {
 
             var dto = config.Map<ForTest7DTO>(entity);
 
-            Assert.True(Enumerable.SequenceEqual(entity.Image1.Select(b => (int)b), dto.Image1));
-            Assert.True(Enumerable.SequenceEqual(entity.Image2, dto.Image2.Select(b => (int)b)));
-            Assert.True(Enumerable.SequenceEqual(entity.Image3, dto.Image3));
+            Assert.True(entity.Image1.Select(b => (int)b).SequenceEqual(dto.Image1));
+            Assert.True(entity.Image2.SequenceEqual(dto.Image2.Select(b => (int)b)));
+            Assert.True(entity.Image3.SequenceEqual(dto.Image3));
+        }
+        
+        [Fact]
+        public void Map_For_Constructor_With_Parameter() {
+            var config = new MapConfiguration();
+            config.RegisterMap<ForTest8, ForTest8DTO>((e, mc) => new ForTest8DTO(e.Id, e.Name));
+
+            var model = new ForTest8(42, "Zaphod");
+            var dto = config.Map<ForTest8, ForTest8DTO>(model);
+
+            Assert.Equal(42, dto.Id);
+            Assert.Equal("Zaphod", dto.Name);
         }
     }
 }

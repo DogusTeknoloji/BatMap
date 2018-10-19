@@ -34,4 +34,16 @@ namespace BatMap.Tests.Model {
         public List<int> Image2 { get; set; }
         public ICollection<byte> Image3 { get; set; }
     }
+    
+    public class ForTest8 {
+        
+        public ForTest8(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+   
+        public int Id { get; }
+        public string Name { get; }
+    }
 }

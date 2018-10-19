@@ -34,4 +34,16 @@ namespace BatMap.Tests.DTO {
         public List<byte?> Image2 { get; set; }
         public Collection<byte> Image3 { get; set; }
     }
+    
+    public class ForTest8DTO {
+        
+        public ForTest8DTO(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+   
+        public int Id { get; }
+        public string Name { get; }
+    }
 }
