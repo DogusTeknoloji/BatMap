@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -62,7 +63,9 @@ namespace BatMap {
                     };
                     var parameterReplaceVisitor = new ParameterReplaceVisitor(replaceParams);
 
-                    return Visit(parameterReplaceVisitor.Visit(memberInit));
+                    var mapExp = Visit(parameterReplaceVisitor.Visit(memberInit));
+                    var nullCheck = Expression.Equal(inPrm, Expression.Constant(null, inPrm.Type));
+                    return Expression.Condition(nullCheck, Expression.Constant(null, outType), mapExp);
                 }
                 case "MapToList": {
                     var retType = node.Method.ReturnType;
