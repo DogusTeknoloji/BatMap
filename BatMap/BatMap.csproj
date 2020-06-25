@@ -14,7 +14,15 @@ Opininated (yet another) mapper, mainly to convert between EF Entities and DTOs.
     <RepositoryUrl>https://github.com/DogusTeknoloji/BatMap</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <ProjectGuid>94cc2d6b-fd3c-4ff6-b6d0-078c42697364</ProjectGuid>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.0'">
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
