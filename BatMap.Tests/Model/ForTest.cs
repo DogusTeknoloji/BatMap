@@ -46,4 +46,8 @@ namespace BatMap.Tests.Model {
         public int Id { get; }
         public string Name { get; }
     }
+
+    public class ForTest9 {
+        public double? Amount { get; set; }
+    }
 }

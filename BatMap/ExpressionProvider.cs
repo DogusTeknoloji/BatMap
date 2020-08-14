@@ -61,7 +61,7 @@ namespace BatMap {
             if (inMember.IsPrimitive) {
                 Expression member = Expression.PropertyOrField(inObjPrm, inMember.Name);
                 if (inMember.Type != outMember.Type) {
-                    if (Helper.TypesCastable(inMember.Type, outMember.Type)) {
+                    if (Helper.TypesCastable(inMember.Type, outMember.Type) || Nullable.GetUnderlyingType(inMember.Type) != null) {
                         member = Expression.MakeUnary(ExpressionType.Convert, member, outMember.Type);
                     }
                     else {
