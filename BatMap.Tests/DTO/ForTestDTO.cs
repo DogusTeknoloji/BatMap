@@ -46,4 +46,8 @@ namespace BatMap.Tests.DTO {
         public int Id { get; }
         public string Name { get; }
     }
+
+    public class ForTest9DTO{
+        public decimal? Amount { get; set; }
+    }
 }

@@ -332,5 +332,17 @@ namespace BatMap.Tests {
             Assert.Equal(42, dto.Id);
             Assert.Equal("Zaphod", dto.Name);
         }
+
+        [Fact]
+        public void Map_Nullable_Conversation_When_Value_Null() {
+            var config = new MapConfiguration();
+            config.RegisterMap<ForTest9, ForTest9DTO>();
+
+            var model = new ForTest9();
+            var dto = config.Map<ForTest9, ForTest9DTO>(model);
+
+            Assert.Equal(dto.Amount, null);
+        }
+
     }
 }
